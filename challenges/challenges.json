@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ID",
+    "name": "Identity",
+    "description": "Write the identity function that returns its input unchanged.\n\nExample: ID 5 should evaluate to 5 (where 5 is represented as a lambda term).",
+    "tests": [
+      {
+        "input": "(\\x.x) apple",
+        "expected": "apple"
+      },
+      {
+        "input": "(\\x.x) (\\y.y)",
+        "expected": "\\y.y"
+      }
+    ],
+    "requirements": []
+  },
+  {
+    "id": "TRUE",
+    "name": "True Function",
+    "description": "Write a function that represents TRUE in lambda calculus.\n\nTRUE should be a function that takes two arguments and returns the first one.\nAlternatively, write it as TRUE = \\x.\\y.x",
+    "tests": [
+      {
+        "input": "(\\x.\\y.x) a b",
+        "expected": "a"
+      },
+      {
+        "input": "(\\x.\\y.x) first second",
+        "expected": "first"
+      }
+    ],
+    "requirements": ["ID"]
+  },
+  {
+    "id": "FALSE",
+    "name": "False Function",
+    "description": "Write a function that represents FALSE in lambda calculus.\n\nFALSE should be a function that takes two arguments and returns the second one.\nAlternatively, write it as FALSE = \\x.\\y.y",
+    "tests": [
+      {
+        "input": "(\\x.\\y.y) a b",
+        "expected": "b"
+      },
+      {
+        "input": "(\\x.\\y.y) first second",
+        "expected": "second"
+      }
+    ],
+    "requirements": ["ID"]
+  },
+  {
+    "id": "FST",
+    "name": "First Element",
+    "description": "Write a function that extracts the first element of a pair.\n\nA pair in lambda calculus is represented as \\z.(z first second)\nFST should extract the 'first' from such a pair.",
+    "tests": [
+      {
+        "input": "(\\p.p (\\x.\\y.x)) (\\z.(z a b))",
+        "expected": "a"
+      },
+      {
+        "input": "(\\p.p (\\x.\\y.x)) (\\z.(z foo bar))",
+        "expected": "foo"
+      }
+    ],
+    "requirements": ["ID", "TRUE"]
+  },
+  {
+    "id": "SCD",
+    "name": "Second Element",
+    "description": "Write a function that extracts the second element of a pair.\n\nA pair in lambda calculus is represented as \\z.(z first second)\nSCD should extract the 'second' from such a pair.",
+    "tests": [
+      {
+        "input": "(\\p.p (\\x.\\y.y)) (\\z.(z a b))",
+        "expected": "b"
+      },
+      {
+        "input": "(\\p.p (\\x.\\y.y)) (\\z.(z foo bar))",
+        "expected": "bar"
+      }
+    ],
+    "requirements": ["ID", "FALSE"]
+  }
+]
