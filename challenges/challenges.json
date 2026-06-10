@@ -48,35 +48,187 @@
     "requirements": ["ID"]
   },
   {
-    "id": "FST",
-    "name": "First Element of Pair",
-    "description": "Extract the first element from a pair.\n\nA pair in lambda calculus is represented as: \\z.(z first second)\nThis is a function that takes a selector function and applies it to both elements.\n\nTo extract the first element, pass it a function that takes two arguments and returns the first (hint: you already wrote this!).",
+    "id": "PAIR",
+    "name": "Create a Pair",
+    "description": "Write a function that creates a pair from two elements.\n\nA pair is a function that takes a selector function and applies it to both elements.\nIn other words: PAIR A B should reduce to \\f.f A B\n\nThis means:\n- PAIR takes two arguments: A and B\n- It returns a function that takes one more argument (f)\n- That function applies f to both A and B\n\nIMPORTANT: Note how application is left-associative and greedy!\n- f A B means (f A) B, NOT f (A B)\n- If you write \\f.f A B, the body 'f A B' will apply f to A first, then apply that result to B\n- That's exactly what we want for a pair!\n\nTest examples:\n- PAIR x y reduces to \\f.f x y\n- Then if you apply it to TRUE (which returns first arg), you get x\n- If you apply it to FALSE (which returns second arg), you get y",
     "tests": [
       {
-        "input": "(\\z.(z apple banana))",
+        "input": "apple banana",
+        "expected": "\\f.f apple banana"
+      },
+      {
+        "input": "first second",
+        "expected": "\\f.f first second"
+      }
+    ],
+    "requirements": ["ID", "TRUE", "FALSE"]
+  },
+  {
+    "id": "FST",
+    "name": "First Element of Pair",
+    "description": "Extract the first element from a pair.\n\nYou've already written functions that select the first argument (TRUE) and can create pairs (PAIR).\nFST should take a pair and apply the \"select first\" function to it.",
+    "tests": [
+      {
+        "input": "(\\f.f apple banana)",
         "expected": "apple"
       },
       {
-        "input": "(\\z.(z foo bar))",
+        "input": "(\\f.f foo bar)",
         "expected": "foo"
       }
     ],
-    "requirements": ["ID", "TRUE"]
+    "requirements": ["ID", "PAIR", "TRUE"]
   },
   {
     "id": "SCD",
     "name": "Second Element of Pair",
-    "description": "Extract the second element from a pair.\n\nA pair in lambda calculus is represented as: \\z.(z first second)\nThis is a function that takes a selector function and applies it to both elements.\n\nTo extract the second element, pass it a function that takes two arguments and returns the second (hint: you already wrote this!).",
+    "description": "Extract the second element from a pair.\n\nSimilar to FST, but extract the second element. You have FALSE which selects the second argument.",
     "tests": [
       {
-        "input": "(\\z.(z apple banana))",
+        "input": "(\\f.f apple banana)",
         "expected": "banana"
       },
       {
-        "input": "(\\z.(z foo bar))",
+        "input": "(\\f.f foo bar)",
         "expected": "bar"
       }
     ],
-    "requirements": ["ID", "FALSE"]
+    "requirements": ["ID", "PAIR", "FALSE"]
+  },
+  {
+    "id": "SWAP",
+    "name": "Swap Arguments",
+    "description": "Write a function that takes two arguments and returns them in reverse order.\n\nSWAP A B should evaluate to B A\n\nThis requires careful use of bracketing since application is left-associative.",
+    "tests": [
+      {
+        "input": "first second",
+        "expected": "second first"
+      },
+      {
+        "input": "apple banana",
+        "expected": "banana apple"
+      }
+    ],
+    "requirements": ["ID"]
+  },
+  {
+    "id": "SQR",
+    "name": "Apply Twice",
+    "description": "Write a function that takes a function F and a value V, and applies F to V twice.\n\nSQR F V should evaluate to F (F V)\n\nNote the brackets! F F V (without brackets) would mean (F F) V due to left-associativity.\nYou need F (F V) to apply F to the result of F V.",
+    "tests": [
+      {
+        "input": "ID test",
+        "expected": "test"
+      },
+      {
+        "input": "SWAP first second",
+        "expected": "first second"
+      }
+    ],
+    "requirements": ["ID", "SWAP"]
+  },
+  {
+    "id": "IF",
+    "name": "Conditional",
+    "description": "Write a function that takes THREE arguments: a boolean, a value if true, and a value if false.\n\nIF BOOLEAN A B should:\n- Reduce to A if BOOLEAN is TRUE\n- Reduce to B if BOOLEAN is FALSE\n\nRemember: TRUE and FALSE are functions that select their first or second argument respectively.",
+    "tests": [
+      {
+        "input": "TRUE apple banana",
+        "expected": "apple"
+      },
+      {
+        "input": "FALSE apple banana",
+        "expected": "banana"
+      }
+    ],
+    "requirements": ["ID", "TRUE", "FALSE"]
+  },
+  {
+    "id": "NOT",
+    "name": "Boolean NOT",
+    "description": "Write a function that negates a boolean.\n\nNOT TRUE should reduce to FALSE\nNOT FALSE should reduce to TRUE\n\nThink about what TRUE and FALSE do - they select arguments. Can you use IF to implement NOT?",
+    "tests": [
+      {
+        "input": "TRUE",
+        "expected": "\\x.\\y.y"
+      },
+      {
+        "input": "FALSE",
+        "expected": "\\x.\\y.x"
+      }
+    ],
+    "requirements": ["IF", "TRUE", "FALSE"]
+  },
+  {
+    "id": "AND",
+    "name": "Boolean AND",
+    "description": "Write a function that performs logical AND on two booleans.\n\nAND should take two boolean arguments and:\n- Return TRUE only if both are TRUE\n- Return FALSE otherwise\n\nThink about what each boolean does and how you can chain them.",
+    "tests": [
+      {
+        "input": "TRUE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "TRUE FALSE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "FALSE TRUE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "FALSE FALSE",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["ID", "TRUE", "FALSE"]
+  },
+  {
+    "id": "OR",
+    "name": "Boolean OR",
+    "description": "Write a function that performs logical OR on two booleans.\n\nOR should take two boolean arguments and:\n- Return FALSE only if both are FALSE\n- Return TRUE otherwise\n\nSimilar to AND, but think about the logic differently.",
+    "tests": [
+      {
+        "input": "TRUE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "TRUE FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE FALSE",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["ID", "TRUE", "FALSE"]
+  },
+  {
+    "id": "XOR",
+    "name": "Boolean XOR",
+    "description": "Write a function that performs logical XOR (exclusive or) on two booleans.\n\nXOR should take two boolean arguments and:\n- Return TRUE if exactly one of them is TRUE\n- Return FALSE otherwise\n\nThis one is trickier! Think about combining AND, OR, and NOT.",
+    "tests": [
+      {
+        "input": "TRUE TRUE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "TRUE FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE FALSE",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["AND", "OR", "NOT", "TRUE", "FALSE"]
   }
 ]
