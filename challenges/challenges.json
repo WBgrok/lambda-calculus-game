@@ -2,15 +2,15 @@
   {
     "id": "ID",
     "name": "Identity",
-    "description": "Write the identity function that returns its input unchanged.\n\nExample: ID 5 should evaluate to 5 (where 5 is represented as a lambda term).",
+    "description": "Write a function that returns its input unchanged.\n\nThis is the simplest possible lambda function. Just pass through the argument.",
     "tests": [
       {
-        "input": "(\\x.x) apple",
+        "input": "apple",
         "expected": "apple"
       },
       {
-        "input": "(\\x.x) (\\y.y)",
-        "expected": "\\y.y"
+        "input": "banana",
+        "expected": "banana"
       }
     ],
     "requirements": []
@@ -18,14 +18,14 @@
   {
     "id": "TRUE",
     "name": "True Function",
-    "description": "Write a function that represents TRUE in lambda calculus.\n\nTRUE should be a function that takes two arguments and returns the first one.\nAlternatively, write it as TRUE = \\x.\\y.x",
+    "description": "Write a function that takes TWO arguments and returns the FIRST one.\n\nRemember: In lambda calculus, a function that takes multiple arguments is written with nested lambdas.\nFor example: \\x.\\y.BODY takes two arguments (first x, then y), and BODY can use both.\n\nSo write a function where the body just returns the first argument, ignoring the second.",
     "tests": [
       {
-        "input": "(\\x.\\y.x) a b",
-        "expected": "a"
+        "input": "apple banana",
+        "expected": "apple"
       },
       {
-        "input": "(\\x.\\y.x) first second",
+        "input": "first second",
         "expected": "first"
       }
     ],
@@ -34,14 +34,14 @@
   {
     "id": "FALSE",
     "name": "False Function",
-    "description": "Write a function that represents FALSE in lambda calculus.\n\nFALSE should be a function that takes two arguments and returns the second one.\nAlternatively, write it as FALSE = \\x.\\y.y",
+    "description": "Write a function that takes TWO arguments and returns the SECOND one.\n\nSimilar to the TRUE function, but this time ignore the first argument and return the second.\n\nRemember: \\x.\\y.BODY is a two-argument function (takes x, then y).",
     "tests": [
       {
-        "input": "(\\x.\\y.y) a b",
-        "expected": "b"
+        "input": "apple banana",
+        "expected": "banana"
       },
       {
-        "input": "(\\x.\\y.y) first second",
+        "input": "first second",
         "expected": "second"
       }
     ],
@@ -49,15 +49,15 @@
   },
   {
     "id": "FST",
-    "name": "First Element",
-    "description": "Write a function that extracts the first element of a pair.\n\nA pair in lambda calculus is represented as \\z.(z first second)\nFST should extract the 'first' from such a pair.",
+    "name": "First Element of Pair",
+    "description": "Extract the first element from a pair.\n\nA pair in lambda calculus is represented as: \\z.(z first second)\nThis is a function that takes a selector function and applies it to both elements.\n\nTo extract the first element, pass it a function that takes two arguments and returns the first (hint: you already wrote this!).",
     "tests": [
       {
-        "input": "(\\p.p (\\x.\\y.x)) (\\z.(z a b))",
-        "expected": "a"
+        "input": "(\\z.(z apple banana))",
+        "expected": "apple"
       },
       {
-        "input": "(\\p.p (\\x.\\y.x)) (\\z.(z foo bar))",
+        "input": "(\\z.(z foo bar))",
         "expected": "foo"
       }
     ],
@@ -65,15 +65,15 @@
   },
   {
     "id": "SCD",
-    "name": "Second Element",
-    "description": "Write a function that extracts the second element of a pair.\n\nA pair in lambda calculus is represented as \\z.(z first second)\nSCD should extract the 'second' from such a pair.",
+    "name": "Second Element of Pair",
+    "description": "Extract the second element from a pair.\n\nA pair in lambda calculus is represented as: \\z.(z first second)\nThis is a function that takes a selector function and applies it to both elements.\n\nTo extract the second element, pass it a function that takes two arguments and returns the second (hint: you already wrote this!).",
     "tests": [
       {
-        "input": "(\\p.p (\\x.\\y.y)) (\\z.(z a b))",
-        "expected": "b"
+        "input": "(\\z.(z apple banana))",
+        "expected": "banana"
       },
       {
-        "input": "(\\p.p (\\x.\\y.y)) (\\z.(z foo bar))",
+        "input": "(\\z.(z foo bar))",
         "expected": "bar"
       }
     ],

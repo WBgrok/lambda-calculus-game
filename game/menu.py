@@ -160,7 +160,11 @@ class Menu:
             if all_passed:
                 print(UI.box(f"✓ Challenge '{challenge.name}' completed!", UI.WIDTH))
                 print(f"\nThe function '{challenge_id}' is now available as an alias.")
-                self.game_state.complete_challenge(challenge_id, None)  # We'll store expr later if needed
+                # Parse the solution to store it as an expression for future use as alias
+                from interpreter.lambda_interpreter import Parser
+                parser = Parser(user_input, self.game_state.get_all_aliases())
+                solution_expr = parser.parse()
+                self.game_state.complete_challenge(challenge_id, solution_expr)
                 input("Press Enter to return to main menu...")
                 return True
             else:
