@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional, Sequence
 
 from game.challenge import Challenge
-from interpreter.lambda_interpreter import Expr
+from interpreter.lambda_interpreter import Expr, ReductionStep
 
 
 class UI:
@@ -118,9 +118,9 @@ class ConsoleView:
                 steps = result.get("steps")
                 if steps:
                     print("\n  Reduction steps:")
-                    for step_expr, step_description in steps[:5]:
-                        print(f"    {step_description}")
-                        print(f"    → {step_expr}")
+                    for step in steps[:5]:
+                        print(f"    {step.description}")
+                        print(f"    → {step.expression}")
                     if len(steps) > 5:
                         print(f"    ... ({len(steps) - 5} more steps)")
             print()
@@ -151,11 +151,11 @@ class ConsoleView:
         print("\n(Enter empty line to return to menu)")
         return input("Expression: ").strip()
 
-    def show_reduction_steps(self, steps: list[tuple[Expr, str]]):
+    def show_reduction_steps(self, steps: Sequence[ReductionStep]):
         print(UI.section("Reduction Steps"))
-        for expr, description in steps[:20]:
-            print(description)
-            print(f"  → {expr}")
+        for step in steps[:20]:
+            print(step.description)
+            print(f"  → {step.expression}")
         if len(steps) > 20:
             print(f"... ({len(steps) - 20} more steps)")
 

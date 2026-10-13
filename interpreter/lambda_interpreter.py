@@ -3,10 +3,9 @@ Lambda calculus interpreter with step-by-step reduction.
 Supports backslash syntax for lambda: \x.body
 """
 
-import re
-from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, Optional, Set, Tuple
 
 
 class ExprType(Enum):
@@ -19,6 +18,23 @@ class ExprType(Enum):
 class Expr:
     """Base class for lambda expressions"""
     pass
+
+
+@dataclass(frozen=True)
+class ReductionStep:
+    """One expression and explanation in an evaluation trace."""
+
+    expression: Expr
+    description: str
+
+
+@dataclass(frozen=True)
+class EvaluationResult:
+    """The parsed input, final expression, and its reduction trace."""
+
+    initial_expression: Expr
+    final_expression: Expr
+    steps: Tuple[ReductionStep, ...]
 
 
 @dataclass
@@ -172,18 +188,21 @@ class Evaluator:
     def __init__(self, aliases: Optional[Dict[str, Expr]] = None, max_steps: int = 10000):
         self.aliases = aliases or {}
         self.max_steps = max_steps
-        self.steps: List[Tuple[Expr, str]] = []
     
-    def evaluate(self, expr: Expr) -> Expr:
-        """Evaluate expression and collect reduction steps"""
-        self.steps = [(expr, "Initial expression")]
+    def evaluate(self, expr: Expr) -> EvaluationResult:
+        """Evaluate an expression and return its final form and reduction trace."""
+        initial_expr = expr
+        steps = [ReductionStep(expr, "Initial expression")]
         
         step_count = 0
         while step_count < self.max_steps:
             if isinstance(expr, App) and isinstance(expr.func, Lambda):
                 # Beta reduction
                 new_expr = self._beta_reduce(expr.func, expr.arg)
-                self.steps.append((new_expr, f"Beta reduction: ({expr.func.param}) applied to {expr.arg}"))
+                steps.append(ReductionStep(
+                    new_expr,
+                    f"Beta reduction: ({expr.func.param}) applied to {expr.arg}",
+                ))
                 expr = new_expr
                 step_count += 1
             elif isinstance(expr, App):
@@ -196,11 +215,11 @@ class Evaluator:
                         # Can't reduce further
                         break
                     expr = App(expr.func, new_arg)
-                    self.steps.append((expr, "Reduce argument"))
+                    steps.append(ReductionStep(expr, "Reduce argument"))
                     step_count += 1
                 else:
                     expr = App(new_func, expr.arg)
-                    self.steps.append((expr, "Reduce function"))
+                    steps.append(ReductionStep(expr, "Reduce function"))
                     step_count += 1
             else:
                 # No more reductions possible
@@ -209,7 +228,7 @@ class Evaluator:
         if step_count >= self.max_steps:
             raise RuntimeError(f"Evaluation exceeded maximum steps ({self.max_steps})")
         
-        return expr
+        return EvaluationResult(initial_expr, expr, tuple(steps))
     
     def _single_step(self, expr: Expr) -> Expr:
         """Perform one reduction step, return same expr if no reduction possible"""
@@ -252,7 +271,7 @@ class Evaluator:
         return expr
     
     @staticmethod
-    def _free_vars(expr: Expr) -> set:
+    def _free_vars(expr: Expr) -> Set[str]:
         """Get set of free variables in expression"""
         if isinstance(expr, Var):
             return {expr.name}
@@ -265,7 +284,7 @@ class Evaluator:
         return set()
     
     @staticmethod
-    def _fresh_var(base: str, avoid: set, free_vars: set) -> str:
+    def _fresh_var(base: str, avoid: Set[str], free_vars: Set[str]) -> str:
         """Generate a fresh variable name"""
         candidate = base
         counter = 0
@@ -274,21 +293,11 @@ class Evaluator:
             candidate = f"{base}_{counter}"
         return candidate
     
-    def format_steps(self) -> str:
-        """Format evaluation steps for display"""
-        lines = []
-        for i, (expr, description) in enumerate(self.steps):
-            lines.append(f"Step {i}: {description}")
-            lines.append(f"  → {expr}")
-        return "\n".join(lines)
-
-
-def parse_and_eval(text: str, aliases: Optional[Dict[str, Expr]] = None) -> Tuple[Expr, List[Tuple[Expr, str]]]:
-    """Parse and evaluate a lambda expression"""
+def parse_and_eval(
+    text: str,
+    aliases: Optional[Dict[str, Expr]] = None,
+) -> EvaluationResult:
+    """Parse an expression, then return its structured evaluation result."""
     parser = Parser(text, aliases)
     expr = parser.parse()
-    
-    evaluator = Evaluator(aliases)
-    result = evaluator.evaluate(expr)
-    
-    return result, evaluator.steps
+    return Evaluator(aliases).evaluate(expr)

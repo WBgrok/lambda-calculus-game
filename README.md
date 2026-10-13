@@ -11,6 +11,14 @@ Learn lambda calculus by solving progressive challenges. Write lambda functions 
 - **Free interpreter**: Test expressions before tackling challenges
 - **Progressive challenges**: Unlock harder challenges by completing prerequisite challenges
 
+## Interpreter Results
+
+`parse_and_eval()` returns an `EvaluationResult` with the original parsed
+expression, the final expression, and an immutable tuple of `ReductionStep`
+objects. Each step contains the expression at that point and a description of
+the reduction. Use `final_expression` for the evaluated result and `steps` for
+the trace.
+
 ## Getting Started
 
 ### Prerequisites

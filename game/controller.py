@@ -102,9 +102,9 @@ class GameController:
                 return "menu"
 
             try:
-                result, steps = parse_and_eval(user_input, aliases)
-                self.view.show_reduction_steps(steps)
-                self.view.show_final_result(result)
+                evaluation = parse_and_eval(user_input, aliases)
+                self.view.show_reduction_steps(evaluation.steps)
+                self.view.show_final_result(evaluation.final_expression)
             except Exception as exc:
                 self.view.show_error(exc)
 

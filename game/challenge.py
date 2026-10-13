@@ -29,8 +29,8 @@ class ChallengeTest:
         Returns: (passed, actual_result, explanation)
         """
         try:
-            result, _ = parse_and_eval(self.input_expr, aliases)
-            actual_result = str(result)
+            result = parse_and_eval(self.input_expr, aliases)
+            actual_result = str(result.final_expression)
             return actual_result == self.expected, actual_result, None
         except Exception as exc:  # pragma: no cover - forward compatibility for runtime issues
             return False, None, str(exc)
@@ -110,8 +110,8 @@ class Challenge:
             full_expr = f"({user_solution}) {test.input_expr}"
 
             try:
-                result, steps = parse_and_eval(full_expr, aliases)
-                actual_result = str(result)
+                evaluation = parse_and_eval(full_expr, aliases)
+                actual_result = str(evaluation.final_expression)
                 passed = actual_result == test.expected
 
                 results.append({
@@ -120,7 +120,7 @@ class Challenge:
                     'expected': test.expected,
                     'actual': actual_result,
                     'error': None,
-                    'steps': steps
+                    'steps': evaluation.steps
                 })
 
                 if not passed:

@@ -10,7 +10,8 @@ A complete text-based lambda calculus learning game with the following component
 - **Features**:
   - Variable substitution with proper alpha conversion
   - Handles nested lambdas and applications
-  - Tracks reduction steps for visualization
+  - Returns structured evaluation results with typed reduction steps
+  - Keeps reduction traces local to each evaluation
   - Supports aliases from completed challenges
 
 ### 2. Challenge System (`game/challenge.py`, `challenges/challenges.json`)

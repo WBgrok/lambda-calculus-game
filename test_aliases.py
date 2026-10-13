@@ -13,9 +13,9 @@ class AliasTests(unittest.TestCase):
         self.game_state.complete_challenge("ID", identity)
 
     def test_completed_challenge_can_be_used_as_alias(self):
-        result, _ = parse_and_eval("ID apple", self.game_state.get_all_aliases())
+        result = parse_and_eval("ID apple", self.game_state.get_all_aliases())
 
-        self.assertEqual(str(result), "apple")
+        self.assertEqual(str(result.final_expression), "apple")
 
     def test_aliases_are_returned_as_a_copy(self):
         aliases = self.game_state.get_all_aliases()
