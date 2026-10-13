@@ -1,47 +1,39 @@
-# Findings for 2026-10-13
+# Project Findings — 2026-10-13
 
-## Project state
+## Current state
 
-The lambda-calculus game is small, focused, and easy to understand. It has a clear teaching goal and the core interpreter is already built around a workable parser + beta-reduction evaluator.
+The project is a working Python console game for learning lambda calculus.
+Challenge definitions live in JSON; the parser and evaluator are kept separate
+from the game controller and console view.
 
-## Strong points
+## Implemented improvements
 
-- The game loop is compact and easy to follow.
-- The challenge/progression concept is clear and useful for teaching.
-- The interpreter supports step-by-step reduction, which is valuable for pedagogy.
-- Challenge requirements and alias unlocking are a good fit for the project’s purpose.
+- Challenge and challenge-test definitions use dataclasses.
+- The console presentation is separated from game flow.
+- Evaluation returns a structured result with an immutable reduction trace.
+- Parser errors and reduction-limit errors have named exception types; expected
+  input errors are handled without swallowing unexpected programming errors.
+- Completed challenges and their aliases are saved to
+  `Path.home() / ".lambda-calculus-game" / "progress.json"`.
+- The main menu resumes saved progress by default and requires confirmation
+  before starting a new game and deleting the save.
+- Automated tests use Python's built-in `unittest` and require no extra
+  dependencies.
 
-## Improvement opportunities
+## Test coverage
 
-### 1. Typed domain models — started
+The test suite covers interpreter reduction and syntax errors, aliases, every
+challenge in the JSON catalog, prerequisite references, controller navigation,
+and progress loading, saving, validation, and reset. Persistence tests use
+temporary directories and do not touch a real user save.
 
-The code currently relies heavily on raw dictionaries for challenge definitions and test results. This makes the code more fragile than it needs to be and scatters schema assumptions across the project.
+## Small remaining cleanup opportunities
 
-The challenge and challenge-test definitions have been converted to dataclasses while retaining dictionary-style compatibility for existing callers. Test results still use dictionaries and can be migrated in a later pass if their shape needs to grow.
+- Challenge solution results are still represented as dictionaries. A typed
+  result model could replace them if the result shape grows.
+- Challenge catalog validation currently occurs through loading and tests;
+  stricter schema validation could be added if challenge authors need clearer
+  diagnostics.
 
-### 2. Separate UI from game logic — implemented
-
-The menu layer currently handles display, input validation, challenge evaluation, and state mutation in one place. Extracting this into a view/controller split would make the project easier to extend and test.
-
-The console rendering and prompts now live in `game/menu.py` as `ConsoleView`; `GameController` in `game/controller.py` owns navigation, challenge evaluation, and state changes.
-
-### 3. Stronger evaluation abstractions — implemented
-
-`parse_and_eval()` now returns an `EvaluationResult` with an immutable trace of `ReductionStep` values. The controller and challenge runner consume this result directly.
-
-### 4. Better error boundaries — implemented
-
-The interpreter now raises named `LambdaSyntaxError` and `EvaluationLimitError` exceptions. Challenge and interactive interpreter flows catch only those expected user-facing failures, while unexpected exceptions propagate. The top-level entry point no longer catches and re-raises every exception.
-
-### 5. Persistence — implemented; tooling — in place
-
-Game progress is automatically saved to `~/.lambda-calculus-game/progress.json` as readable JSON. On startup, completed challenges and their lambda aliases are restored. The main menu offers a confirmation-protected New Game action that removes saved progress. Save/load failures are reported explicitly.
-
-The test suite uses Python's standard-library `unittest` runner; no extra test dependency is needed. Persistence and new-game behavior are covered with temporary save files.
-
-## Remaining improvement ideas
-
-- Convert challenge-test result dictionaries into a typed result model if their shape grows.
-- Add more challenges or teaching aids (hints, difficulty, scoring) based on actual gameplay needs.
-
-No additional backend or framework is currently justified for this small, local game.
+No database or additional framework is currently needed for the project's
+scope.

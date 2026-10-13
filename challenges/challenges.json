@@ -121,8 +121,8 @@
         "expected": "test"
       },
       {
-        "input": "SWAP first second",
-        "expected": "first second"
+        "input": "(\\x.x apple) (\\x.x)",
+        "expected": "apple apple"
       }
     ],
     "requirements": ["ID", "SWAP"]

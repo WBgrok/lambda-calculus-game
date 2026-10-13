@@ -126,6 +126,9 @@ class ConsoleView:
             else:
                 print(f"  Input:    {result['input']}")
                 print(f"  Expected: {result['expected']}")
+                expected_result = result.get("expected_result")
+                if expected_result is not None and expected_result != result["expected"]:
+                    print(f"            ({expected_result})")
                 print(f"  Got:      {result['actual']}")
 
                 steps = result.get("steps")

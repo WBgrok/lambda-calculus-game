@@ -1,123 +1,56 @@
-# Setup Instructions
+# Development Setup
 
-## Local Development
+## Requirements
 
-### Prerequisites
-- Python 3.8 or higher
-- Git
+- Python 3.8 or later
+- No third-party packages are needed.
 
-### Installation
+## Optional virtual environment
 
-1. Navigate to the project directory:
-```bash
-cd lambda-calculus-game
-```
+Windows PowerShell:
 
-2. No additional dependencies needed (uses only Python standard library)
-
-### Running the Game
-
-```bash
-python main.py
-```
-
-Progress is automatically saved to `~/.lambda-calculus-game/progress.json`.
-Select **New Game** in the main menu to clear it; the game confirms before
-deleting saved progress.
-
-### Running the Automated Tests
-
-The project uses Python's built-in `unittest`; no test package installation is
-needed:
-```bash
-python -m unittest discover -v
-```
-
-On Windows, an isolated virtual environment is optional:
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
+```
+
+macOS/Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+The game and tests use the Python standard library. From the project root:
+
+```bash
+python main.py
 python -m unittest discover -v
 ```
 
-## Pushing to GitHub
+## Progress save
 
-### First Time Setup
+The game automatically saves completed challenges and their aliases to
+`Path.home() / ".lambda-calculus-game" / "progress.json"`. Tests pass a
+temporary path to `GameState`, so they do not access or modify the real save.
 
-1. Create a new repository on GitHub:
-   - Go to https://github.com/new
-   - Name it "lambda-calculus-game"
-   - Do NOT initialize with README (we already have one)
-   - Click "Create repository"
-
-2. In the project directory, configure and push:
-
-```bash
-# Set your GitHub username and email
-git config --global user.name "Your Name"
-git config --global user.email "your.email@github.com"
-
-# Create initial commit if not already done
-git add .
-git commit -m "Initial project setup: Lambda calculus game prototype"
-
-# Add remote and push
-git remote add origin https://github.com/YOUR-USERNAME/lambda-calculus-game.git
-git branch -M main
-git push -u origin main
-```
-
-Replace `YOUR-USERNAME` with your actual GitHub username.
-
-3. If you get authentication errors:
-   - For HTTPS: Use a personal access token instead of password
-     - Create one at https://github.com/settings/tokens
-     - Use token as password when prompted
-   - For SSH: Set up SSH keys at https://github.com/settings/keys
-
-### Making Changes and Committing
-
-```bash
-# Stage changes
-git add .
-
-# Commit with a message
-git commit -m "Description of changes"
-
-# Push to GitHub
-git push
-```
-
-## Project Structure
+## Project layout
 
 ```
-lambda-calculus-game/
-├── README.md                 # Project overview
-├── main.py                   # Game entry point
-├── test_interpreter.py       # Interpreter tests
-├── interpreter/
-│   ├── __init__.py
-│   └── lambda_interpreter.py # Core lambda calculus interpreter
-├── game/
-│   ├── __init__.py
-│   ├── controller.py      # Game flow and actions
-│   ├── game_state.py         # Session state management
-│   ├── challenge.py          # Challenge system
-│   └── menu.py               # Console presentation
-└── challenges/
-    ├── __init__.py
-    └── challenges.json       # Challenge definitions
+main.py
+requirements.txt
+game/
+    challenge.py       Challenge definitions and solution tests
+    controller.py      Game navigation and actions
+    game_state.py      Challenge state and save/load
+    menu.py            Console prompts and presentation
+interpreter/
+    lambda_interpreter.py
+challenges/
+    challenges.json    Challenge catalog and test cases
+test_aliases.py
+test_challenge_fix.py
+test_interpreter.py
+test_new_challenges.py
+test_progress.py
 ```
-
-## Game Features (Prototype)
-
-- **Lambda Interpreter**: Supports backslash syntax (`\x.body`)
-- **Step-by-step Reduction**: Shows each beta reduction step
-- **Challenge System**: Progressive challenges with test verification
-- **Aliases**: Completed challenges become reusable aliases
-- **Free Interpreter**: Test expressions freely between challenges
-- **ASCII UI**: Text-based interface with formatted menus
-
-## Next Steps
-
-See README.md for gameplay information and challenge format.

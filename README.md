@@ -1,107 +1,83 @@
 # Lambda Calculus Game
 
-A text-based game teaching lambda calculus through interactive challenges.
+A console game for learning lambda calculus through progressive challenges.
+Write lambda expressions, see each reduction step, and reuse completed
+solutions as aliases.
 
-## Overview
+## Features
 
-Learn lambda calculus by solving progressive challenges. Write lambda functions to meet specifications, and as you complete challenges, your solutions become reusable aliases.
+- Backslash lambda notation, for example `\x.x` for identity
+- Step-by-step beta reduction and a free interpreter
+- Thirteen challenges with prerequisite-based unlocking
+- Automatic progress saving and resume between runs
+- A confirmation-protected **New Game** option
 
-- **Backslash syntax**: Use `\` to denote lambda (e.g., `\x.x` is the identity function)
-- **Step-by-step reduction**: See how your lambda expression evaluates
-- **Free interpreter**: Test expressions before tackling challenges
-- **Progressive challenges**: Unlock harder challenges by completing prerequisite challenges
-- **Saved progress**: Completed challenges and aliases are restored when you relaunch
+## Requirements and installation
 
-## Interpreter Results
+- Python 3.8 or later
+- No third-party Python packages are required
 
-`parse_and_eval()` returns an `EvaluationResult` with the original parsed
-expression, the final expression, and an immutable tuple of `ReductionStep`
-objects. Each step contains the expression at that point and a description of
-the reduction. Use `final_expression` for the evaluated result and `steps` for
-the trace.
-
-Malformed input raises `LambdaSyntaxError` (a `SyntaxError` subclass), and
-expressions that exceed the reduction limit raise `EvaluationLimitError` (a
-`RuntimeError` subclass). The console reports these expected input/evaluation
-errors; unexpected programming errors are allowed to surface for debugging.
-
-## Getting Started
-
-### Prerequisites
-- Python 3.8+
-
-### Installation
-
-```bash
-git clone <your-repo-url>
-cd lambda-calculus-game
-pip install -r requirements.txt
-```
-
-### Running the Game
+From the project directory, run the game:
 
 ```bash
 python main.py
 ```
 
-Progress is saved automatically as JSON in `~/.lambda-calculus-game/progress.json`.
-Choose **New Game** from the main menu to erase the save and start over; the
-game asks for confirmation before clearing it.
+Progress is saved as JSON at
+`Path.home() / ".lambda-calculus-game" / "progress.json"` (under the current
+user's home directory). Completing a challenge saves automatically. Select
+**New Game** in the main menu to remove the save; the game asks for confirmation
+first.
 
-### Running the Tests
+## Tests
 
-The automated tests use Python's built-in `unittest` module, so no additional
-test dependencies are required:
+Run the complete standard-library test suite from the project directory:
 
 ```bash
 python -m unittest discover -v
 ```
 
-On Windows, you can optionally create and activate an isolated virtual
-environment before running the game or tests:
+Tests cover parsing and reduction, aliases, all challenge definitions,
+controller flows, and save/load/reset behavior. They use temporary progress
+files and do not change the user's game save.
 
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m unittest discover -v
+## Lambda syntax
+
+- `\x.body` defines a function.
+- `function argument` applies a function to an argument; application is
+  left-associative.
+- Parentheses group expressions.
+- Multiple parameters are written as nested lambdas, e.g. `\x.\y.x`.
+- A completed challenge ID, such as `ID`, can be used as an alias.
+
+## Evaluation API
+
+`parse_and_eval(source, aliases=None)` returns an `EvaluationResult`:
+
+- `initial_expression`: parsed input expression
+- `final_expression`: expression after reduction
+- `steps`: immutable tuple of `ReductionStep` objects, each with `expression`
+  and `description`
+
+Malformed source raises `LambdaSyntaxError` (a `SyntaxError` subclass);
+reduction-limit exhaustion raises `EvaluationLimitError` (a `RuntimeError`
+subclass).
+
+## Challenge definitions
+
+Challenges are defined in `challenges/challenges.json`. Each entry has an
+`id`, `name`, `description`, a list of `tests` (`input` and `expected` source
+expressions), and optional prerequisite challenge IDs in `requirements`.
+
+## Project layout
+
 ```
-
-## Project Structure
-
+main.py                 Game entry point
+game/controller.py      Game flow
+game/menu.py            Console presentation
+game/game_state.py      Challenge state and progress persistence
+game/challenge.py       Challenge models and solution testing
+interpreter/             Parser and lambda evaluator
+challenges/challenges.json
+test_*.py                Standard-library automated tests
 ```
-lambda-calculus-game/
-├── main.py                 # Entry point
-├── test_*.py               # Standard-library automated tests
-├── interpreter/            # Lambda calculus interpreter
-│   └── lambda_interpreter.py
-├── game/                   # Game logic
-│   ├── controller.py      # Game flow and actions
-│   ├── menu.py            # Console presentation
-│   ├── challenge.py       # Challenge system
-│   └── game_state.py      # Session state
-└── challenges/            # Challenge definitions
-    └── challenges.json
-```
-
-## Challenge Format
-
-Challenges are stored in `challenges/challenges.json`:
-
-```json
-{
-  "id": "ID",
-  "name": "Challenge Name",
-  "description": "What the player needs to do",
-  "tests": [
-    {
-      "input": "test expression",
-      "expected": "expected result"
-    }
-  ],
-  "requirements": ["prereq_id1", "prereq_id2"]
-}
-```
-
-## License
-
-MIT

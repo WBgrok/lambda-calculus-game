@@ -34,8 +34,10 @@ class ChallengeTest:
         """
         try:
             result = parse_and_eval(self.input_expr, aliases)
+            expected = parse_and_eval(self.expected, aliases)
             actual_result = str(result.final_expression)
-            return actual_result == self.expected, actual_result, None
+            expected_result = str(expected.final_expression)
+            return actual_result == expected_result, actual_result, None
         except (LambdaSyntaxError, EvaluationLimitError) as exc:
             return False, None, str(exc)
 
@@ -115,13 +117,16 @@ class Challenge:
 
             try:
                 evaluation = parse_and_eval(full_expr, aliases)
+                expected = parse_and_eval(test.expected, aliases)
                 actual_result = str(evaluation.final_expression)
-                passed = actual_result == test.expected
+                expected_result = str(expected.final_expression)
+                passed = actual_result == expected_result
 
                 results.append({
                     'passed': passed,
                     'input': full_expr,
                     'expected': test.expected,
+                    'expected_result': expected_result,
                     'actual': actual_result,
                     'error': None,
                     'steps': evaluation.steps
@@ -134,6 +139,7 @@ class Challenge:
                     'passed': False,
                     'input': full_expr,
                     'expected': test.expected,
+                    'expected_result': None,
                     'actual': None,
                     'error': f"{type(exc).__name__}: {exc}",
                     'steps': []
