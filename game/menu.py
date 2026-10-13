@@ -2,7 +2,6 @@
 
 from typing import Optional
 from game.game_state import GameState
-from game.challenge import Challenge
 from interpreter.lambda_interpreter import parse_and_eval
 
 
@@ -95,12 +94,10 @@ class Menu:
         Display challenge and allow user to solve it.
         Returns: True if challenge was completed, False otherwise
         """
-        ch_dict = self.game_state.get_challenge(challenge_id)
-        if not ch_dict:
+        challenge = self.game_state.get_challenge(challenge_id)
+        if not challenge:
             print(f"Challenge {challenge_id} not found.")
             return False
-        
-        challenge = Challenge(ch_dict)
         
         while True:
             print(UI.header(f"Challenge: {challenge.name}"))

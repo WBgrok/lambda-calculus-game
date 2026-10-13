@@ -1,36 +1,36 @@
-#!/usr/bin/env python3
-"""Quick test of the lambda interpreter"""
+"""Automated tests for the lambda calculus interpreter."""
+
+import unittest
 
 from interpreter.lambda_interpreter import parse_and_eval
 
-# Test identity
-print("Test 1: Identity function")
-expr = r"\x.x"
-result, steps = parse_and_eval(expr)
-print(f"  Expression: {expr}")
-print(f"  Result: {result}")
-print()
 
-# Test identity applied to a variable
-print("Test 2: Identity applied to 'apple'")
-expr = r"(\x.x) apple"
-result, steps = parse_and_eval(expr)
-print(f"  Expression: {expr}")
-print(f"  Reduction steps:")
-for step_expr, desc in steps:
-    print(f"    {desc}: {step_expr}")
-print(f"  Result: {result}")
-print()
+class InterpreterTests(unittest.TestCase):
+    def test_identity_reduces_to_its_argument(self):
+        result, steps = parse_and_eval(r"(\x.x) apple")
 
-# Test TRUE function
-print("Test 3: TRUE function (\\x.\\y.x)")
-expr = r"(\x.\y.x) first second"
-result, steps = parse_and_eval(expr)
-print(f"  Expression: {expr}")
-print(f"  Reduction steps:")
-for step_expr, desc in steps:
-    print(f"    {desc}: {step_expr}")
-print(f"  Result: {result}")
-print()
+        self.assertEqual(str(result), "apple")
+        self.assertGreater(len(steps), 1)
 
-print("All tests completed!")
+    def test_beta_reduction_avoids_capturing_free_variable(self):
+        result, _ = parse_and_eval(r"(\x.\y.x) y")
+
+        self.assertEqual(str(result), r"\y_1.y")
+
+    def test_application_is_left_associative(self):
+        result, _ = parse_and_eval(r"(\x.\y.x) first second")
+
+        self.assertEqual(str(result), "first")
+
+    def test_maximum_reduction_steps_stops_infinite_reduction(self):
+        from interpreter.lambda_interpreter import Evaluator, Parser
+
+        expression = Parser(r"(\x.x x) (\x.x x)").parse()
+        evaluator = Evaluator(max_steps=10)
+
+        with self.assertRaisesRegex(RuntimeError, "maximum steps"):
+            evaluator.evaluate(expression)
+
+
+if __name__ == "__main__":
+    unittest.main()

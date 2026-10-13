@@ -1,8 +1,10 @@
 """Game state management"""
 
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 from game.challenge import Challenge
 from interpreter.lambda_interpreter import Expr
@@ -24,7 +26,7 @@ class GameState:
             raw_challenges = json.load(file)
         self.challenges_data = [Challenge.from_dict(challenge) for challenge in raw_challenges]
 
-    def get_challenge(self, challenge_id: str) -> Challenge | None:
+    def get_challenge(self, challenge_id: str) -> Optional[Challenge]:
         """Get challenge by ID."""
         for challenge in self.challenges_data:
             if challenge.id == challenge_id:

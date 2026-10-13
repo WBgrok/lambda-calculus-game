@@ -21,11 +21,19 @@ cd lambda-calculus-game
 python main.py
 ```
 
-### Testing the Interpreter
+### Running the Automated Tests
 
-Run the test script to verify the lambda interpreter:
+The project uses Python's built-in `unittest`; no test package installation is
+needed:
 ```bash
-python test_interpreter.py
+python -m unittest discover -v
+```
+
+On Windows, an isolated virtual environment is optional:
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m unittest discover -v
 ```
 
 ## Pushing to GitHub

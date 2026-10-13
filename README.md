@@ -30,11 +30,30 @@ pip install -r requirements.txt
 python main.py
 ```
 
+### Running the Tests
+
+The automated tests use Python's built-in `unittest` module, so no additional
+test dependencies are required:
+
+```bash
+python -m unittest discover -v
+```
+
+On Windows, you can optionally create and activate an isolated virtual
+environment before running the game or tests:
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m unittest discover -v
+```
+
 ## Project Structure
 
 ```
 lambda-calculus-game/
 ├── main.py                 # Entry point
+├── test_*.py               # Standard-library automated tests
 ├── interpreter/            # Lambda calculus interpreter
 │   └── lambda_interpreter.py
 ├── game/                   # Game logic

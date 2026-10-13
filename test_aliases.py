@@ -1,45 +1,28 @@
-#!/usr/bin/env python3
-"""Test alias display in menus"""
+"""Automated tests for challenge aliases."""
+
+import unittest
 
 from game.game_state import GameState
-from interpreter.lambda_interpreter import Parser
+from interpreter.lambda_interpreter import Parser, parse_and_eval
 
-# Create game state
-game_state = GameState()
 
-# Complete a few challenges
-challenges_to_complete = [
-    (r"\x.x", "ID"),
-    (r"\x.\y.x", "TRUE"),
-    (r"\x.\y.y", "FALSE"),
-]
+class AliasTests(unittest.TestCase):
+    def setUp(self):
+        self.game_state = GameState()
+        identity = Parser(r"\x.x").parse()
+        self.game_state.complete_challenge("ID", identity)
 
-for solution, challenge_id in challenges_to_complete:
-    parser = Parser(solution)
-    expr = parser.parse()
-    game_state.complete_challenge(challenge_id, expr)
+    def test_completed_challenge_can_be_used_as_alias(self):
+        result, _ = parse_and_eval("ID apple", self.game_state.get_all_aliases())
 
-print("Completed challenges: ID, TRUE, FALSE")
-print()
+        self.assertEqual(str(result), "apple")
 
-print("Available aliases:")
-print("-" * 40)
-for alias_id in sorted(game_state.aliases.keys()):
-    expr = game_state.aliases[alias_id]
-    print(f"  {alias_id}: {expr}")
+    def test_aliases_are_returned_as_a_copy(self):
+        aliases = self.game_state.get_all_aliases()
+        aliases.clear()
 
-print()
-print("Testing that aliases can be used in parsing:")
-print("-" * 40)
+        self.assertIn("ID", self.game_state.get_all_aliases())
 
-# Now test that we can use these aliases in new expressions
-parser = Parser(r"ID apple", game_state.get_all_aliases())
-expr = parser.parse()
-print(f"Parsed 'ID apple' as: {expr}")
 
-parser = Parser(r"TRUE first second", game_state.get_all_aliases())
-expr = parser.parse()
-print(f"Parsed 'TRUE first second' as: {expr}")
-
-print()
-print("✓ Alias display and substitution working correctly!")
+if __name__ == "__main__":
+    unittest.main()
