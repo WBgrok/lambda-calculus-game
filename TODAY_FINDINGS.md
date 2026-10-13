@@ -25,18 +25,20 @@ The menu layer currently handles display, input validation, challenge evaluation
 
 The console rendering and prompts now live in `game/menu.py` as `ConsoleView`; `GameController` in `game/controller.py` owns navigation, challenge evaluation, and state changes.
 
-### 3. Stronger evaluation abstractions — next
+### 3. Stronger evaluation abstractions — implemented
 
 The lambda evaluator is fine for a teaching tool, but the current `parse_and_eval` flow and result handling are not structured enough for deeper validation or future features like richer challenge feedback, debug modes, or persistence.
 
-### 4. Better error boundaries
+`parse_and_eval()` now returns an `EvaluationResult` with an immutable trace of `ReductionStep` values. The controller and challenge runner consume this result directly.
 
-Top-level exception handling is broad and not very descriptive. A project-specific exception model would improve debugability and user-facing feedback.
+### 4. Better error boundaries — implemented
 
-### 5. Persistence and tooling
+The interpreter now raises named `LambdaSyntaxError` and `EvaluationLimitError` exceptions. Challenge and interactive interpreter flows catch only those expected user-facing failures, while unexpected exceptions propagate. The top-level entry point no longer catches and re-raises every exception.
+
+### 5. Persistence and tooling — next
 
 The project currently lacks a formal test runner setup in the local environment, and there is no persisted progress model yet. Adding a lightweight save file or SQLite-backed progress system would be a worthwhile next milestone.
 
 ## Immediate next step
 
-We will begin by introducing a typed challenge model while keeping compatibility with existing code paths. This refactor is small, meaningful, and makes the rest of the codebase easier to evolve safely.
+Implement persisted game progress so completed challenges and their aliases survive across runs.

@@ -19,6 +19,11 @@ objects. Each step contains the expression at that point and a description of
 the reduction. Use `final_expression` for the evaluated result and `steps` for
 the trace.
 
+Malformed input raises `LambdaSyntaxError` (a `SyntaxError` subclass), and
+expressions that exceed the reduction limit raise `EvaluationLimitError` (a
+`RuntimeError` subclass). The console reports these expected input/evaluation
+errors; unexpected programming errors are allowed to surface for debugging.
+
 ## Getting Started
 
 ### Prerequisites

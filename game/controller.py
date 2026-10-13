@@ -6,7 +6,12 @@ from typing import Optional
 
 from game.game_state import GameState
 from game.menu import ConsoleView
-from interpreter.lambda_interpreter import Parser, parse_and_eval
+from interpreter.lambda_interpreter import (
+    EvaluationLimitError,
+    LambdaSyntaxError,
+    Parser,
+    parse_and_eval,
+)
 
 
 class GameController:
@@ -105,7 +110,7 @@ class GameController:
                 evaluation = parse_and_eval(user_input, aliases)
                 self.view.show_reduction_steps(evaluation.steps)
                 self.view.show_final_result(evaluation.final_expression)
-            except Exception as exc:
+            except (LambdaSyntaxError, EvaluationLimitError) as exc:
                 self.view.show_error(exc)
 
 

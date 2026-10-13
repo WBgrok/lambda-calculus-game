@@ -3,8 +3,10 @@
 import unittest
 
 from interpreter.lambda_interpreter import (
+    EvaluationLimitError,
     EvaluationResult,
     Evaluator,
+    LambdaSyntaxError,
     Parser,
     parse_and_eval,
 )
@@ -43,8 +45,16 @@ class InterpreterTests(unittest.TestCase):
         expression = Parser(r"(\x.x x) (\x.x x)").parse()
         evaluator = Evaluator(max_steps=10)
 
-        with self.assertRaisesRegex(RuntimeError, "maximum steps"):
+        with self.assertRaisesRegex(EvaluationLimitError, "maximum steps"):
             evaluator.evaluate(expression)
+
+    def test_invalid_token_raises_lambda_syntax_error(self):
+        with self.assertRaisesRegex(LambdaSyntaxError, "Expected variable"):
+            parse_and_eval("!")
+
+    def test_parser_errors_remain_syntax_error_compatible(self):
+        with self.assertRaises(SyntaxError):
+            parse_and_eval(r"\x")
 
 
 if __name__ == "__main__":

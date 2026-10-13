@@ -14,9 +14,6 @@ def main():
         main_loop(game_state)
     except KeyboardInterrupt:
         print("\n\nGame interrupted. Goodbye!")
-    except Exception as e:
-        print(f"\nFatal error: {e}")
-        raise
 
 
 if __name__ == "__main__":

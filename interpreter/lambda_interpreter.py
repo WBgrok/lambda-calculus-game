@@ -14,6 +14,14 @@ class ExprType(Enum):
     APPLICATION = "app"
 
 
+class LambdaSyntaxError(SyntaxError):
+    """Invalid lambda-calculus source expression."""
+
+
+class EvaluationLimitError(RuntimeError):
+    """Evaluation exceeded its configured reduction-step limit."""
+
+
 @dataclass
 class Expr:
     """Base class for lambda expressions"""
@@ -87,7 +95,9 @@ class Parser:
         """Parse a complete expression"""
         expr = self._parse_expr()
         if self.pos < len(self.text):
-            raise SyntaxError(f"Unexpected characters at position {self.pos}: {self.text[self.pos:]}")
+            raise LambdaSyntaxError(
+                f"Unexpected characters at position {self.pos}: {self.text[self.pos:]}"
+            )
         return expr
     
     def _parse_expr(self) -> Expr:
@@ -111,7 +121,7 @@ class Parser:
         self._skip_whitespace()
         
         if self.pos >= len(self.text):
-            raise SyntaxError("Unexpected end of input")
+            raise LambdaSyntaxError("Unexpected end of input")
         
         if self.text[self.pos] == '\\':
             return self._parse_lambda()
@@ -127,13 +137,17 @@ class Parser:
         
         # Parse parameter
         if self.pos >= len(self.text) or not self._is_var_char(self.text[self.pos]):
-            raise SyntaxError(f"Expected variable after \\ at position {self.pos}")
+            raise LambdaSyntaxError(
+                f"Expected variable after \\ at position {self.pos}"
+            )
         
         param = self._parse_identifier()
         self._skip_whitespace()
         
         if self.pos >= len(self.text) or self.text[self.pos] != '.':
-            raise SyntaxError(f"Expected '.' after lambda parameter at position {self.pos}")
+            raise LambdaSyntaxError(
+                f"Expected '.' after lambda parameter at position {self.pos}"
+            )
         
         self.pos += 1  # consume .
         body = self._parse_expr()
@@ -149,7 +163,7 @@ class Parser:
         
         self._skip_whitespace()
         if self.pos >= len(self.text) or self.text[self.pos] != ')':
-            raise SyntaxError(f"Expected ')' at position {self.pos}")
+            raise LambdaSyntaxError(f"Expected ')' at position {self.pos}")
         
         self.pos += 1  # consume )
         return expr
@@ -157,6 +171,10 @@ class Parser:
     def _parse_var(self) -> Expr:
         """Parse variable or alias"""
         name = self._parse_identifier()
+        if not name:
+            raise LambdaSyntaxError(
+                f"Expected variable at position {self.pos}, got {self.text[self.pos]!r}"
+            )
         
         # Check if it's an alias
         if name in self.aliases:
@@ -226,7 +244,9 @@ class Evaluator:
                 break
         
         if step_count >= self.max_steps:
-            raise RuntimeError(f"Evaluation exceeded maximum steps ({self.max_steps})")
+            raise EvaluationLimitError(
+                f"Evaluation exceeded maximum steps ({self.max_steps})"
+            )
         
         return EvaluationResult(initial_expr, expr, tuple(steps))
     

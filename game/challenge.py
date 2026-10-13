@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from interpreter.lambda_interpreter import parse_and_eval
+from interpreter.lambda_interpreter import (
+    EvaluationLimitError,
+    LambdaSyntaxError,
+    parse_and_eval,
+)
 
 
 @dataclass(frozen=True)
@@ -23,7 +27,7 @@ class ChallengeTest:
             expected=str(challenge_test["expected"]),
         )
 
-    def run(self, aliases: dict) -> Tuple[bool, str, str]:
+    def run(self, aliases: dict) -> Tuple[bool, Optional[str], Optional[str]]:
         """
         Run the test.
         Returns: (passed, actual_result, explanation)
@@ -32,7 +36,7 @@ class ChallengeTest:
             result = parse_and_eval(self.input_expr, aliases)
             actual_result = str(result.final_expression)
             return actual_result == self.expected, actual_result, None
-        except Exception as exc:  # pragma: no cover - forward compatibility for runtime issues
+        except (LambdaSyntaxError, EvaluationLimitError) as exc:
             return False, None, str(exc)
 
     def as_dict(self) -> Dict[str, str]:
@@ -94,13 +98,13 @@ class Challenge:
         """
         try:
             parse_and_eval(user_solution, aliases)
-        except Exception as exc:  # pragma: no cover - runtime validation path
+        except (LambdaSyntaxError, EvaluationLimitError) as exc:
             return False, [{
                 'passed': False,
                 'input': user_solution,
-                'expected': 'Valid lambda expression',
+                'expected': 'A valid terminating lambda expression',
                 'actual': None,
-                'error': f"Syntax error: {exc}"
+                'error': f"{type(exc).__name__}: {exc}"
             }]
 
         results = []
@@ -125,13 +129,13 @@ class Challenge:
 
                 if not passed:
                     all_passed = False
-            except Exception as exc:
+            except (LambdaSyntaxError, EvaluationLimitError) as exc:
                 results.append({
                     'passed': False,
                     'input': full_expr,
                     'expected': test.expected,
                     'actual': None,
-                    'error': str(exc),
+                    'error': f"{type(exc).__name__}: {exc}",
                     'steps': []
                 })
                 all_passed = False

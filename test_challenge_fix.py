@@ -36,7 +36,16 @@ class ChallengeTests(unittest.TestCase):
         )
 
         self.assertFalse(passed)
-        self.assertIn("Syntax error", results[0]["error"])
+        self.assertIn("LambdaSyntaxError", results[0]["error"])
+
+    def test_unexpected_challenge_failure_is_not_hidden(self):
+        challenge = self.game_state.get_challenge("TRUE")
+        with patch("game.challenge.parse_and_eval", side_effect=ValueError("bug")):
+            with self.assertRaisesRegex(ValueError, "bug"):
+                challenge.test_solution(
+                    r"\x.\y.x",
+                    self.game_state.get_all_aliases(),
+                )
 
     def test_challenge_unlocks_after_all_prerequisites(self):
         available_ids = {
@@ -79,6 +88,14 @@ class ChallengeTests(unittest.TestCase):
         ):
             with redirect_stdout(io.StringIO()):
                 controller.run()
+
+    def test_free_interpreter_does_not_hide_unexpected_errors(self):
+        controller = GameController(self.game_state)
+        with patch("builtins.input", return_value="anything"):
+            with patch("game.controller.parse_and_eval", side_effect=ValueError("bug")):
+                with redirect_stdout(io.StringIO()):
+                    with self.assertRaisesRegex(ValueError, "bug"):
+                        controller.free_interpreter()
 
 
 if __name__ == "__main__":
