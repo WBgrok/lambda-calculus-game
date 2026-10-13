@@ -1,8 +1,10 @@
 """Automated tests for challenge validation and menu flow."""
 
 import io
+import tempfile
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 from unittest.mock import patch
 
 from game.game_state import GameState
@@ -12,7 +14,10 @@ from interpreter.lambda_interpreter import Parser
 
 class ChallengeTests(unittest.TestCase):
     def setUp(self):
-        self.game_state = GameState()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        progress_path = Path(self.temp_dir.name) / "progress.json"
+        self.game_state = GameState(progress_path=progress_path)
         identity = Parser(r"\x.x").parse()
         self.game_state.complete_challenge("ID", identity)
 
@@ -84,10 +89,37 @@ class ChallengeTests(unittest.TestCase):
         available_count = len(self.game_state.get_available_challenges())
         with patch(
             "builtins.input",
-            side_effect=[str(available_count + 1), "", str(available_count + 2)],
+            side_effect=[str(available_count + 1), "", str(available_count + 3)],
         ):
             with redirect_stdout(io.StringIO()):
                 controller.run()
+
+    def test_new_game_requires_confirmation_before_reset(self):
+        controller = GameController(self.game_state)
+        available_count = len(self.game_state.get_available_challenges())
+        with patch(
+            "builtins.input",
+            side_effect=[str(available_count + 2), "n", str(available_count + 3)],
+        ):
+            with redirect_stdout(io.StringIO()):
+                controller.run()
+
+        self.assertTrue(self.game_state.is_completed("ID"))
+        self.assertTrue(self.game_state.progress_path.exists())
+
+    def test_confirmed_new_game_clears_saved_progress(self):
+        controller = GameController(self.game_state)
+        available_count = len(self.game_state.get_available_challenges())
+        with patch(
+            "builtins.input",
+            side_effect=[str(available_count + 2), "y", "3"],
+        ):
+            with redirect_stdout(io.StringIO()):
+                controller.run()
+
+        self.assertFalse(self.game_state.completed_challenges)
+        self.assertFalse(self.game_state.aliases)
+        self.assertFalse(self.game_state.progress_path.exists())
 
     def test_free_interpreter_does_not_hide_unexpected_errors(self):
         controller = GameController(self.game_state)

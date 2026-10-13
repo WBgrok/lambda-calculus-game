@@ -47,7 +47,18 @@ class GameController:
                     if self.free_interpreter() != "menu":
                         break
                     continue
-                if choice_number != len(available) + 2:
+                if (
+                    self.game_state.completed_challenges
+                    and choice_number == len(available) + 2
+                ):
+                    if self.view.confirm_new_game():
+                        self.game_state.reset_progress()
+                        self.view.show_new_game_started()
+                    continue
+                quit_choice = len(available) + (
+                    3 if self.game_state.completed_challenges else 2
+                )
+                if choice_number != quit_choice:
                     self.view.show_invalid_menu_choice()
                     self.view.pause("Press Enter to continue...")
                     continue

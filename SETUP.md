@@ -21,6 +21,10 @@ cd lambda-calculus-game
 python main.py
 ```
 
+Progress is automatically saved to `~/.lambda-calculus-game/progress.json`.
+Select **New Game** in the main menu to clear it; the game confirms before
+deleting saved progress.
+
 ### Running the Automated Tests
 
 The project uses Python's built-in `unittest`; no test package installation is

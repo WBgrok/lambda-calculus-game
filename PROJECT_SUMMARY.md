@@ -29,7 +29,8 @@ A complete text-based lambda calculus learning game with the following component
 
 ### 3. Game State Management (`game/game_state.py`)
 - Tracks completed challenges
-- Manages session-persistent aliases
+- Saves and restores completed challenges and aliases as JSON in the user's home directory
+- Offers confirmation-protected progress reset for a new game
 - Loads challenge definitions from JSON
 - Validates challenge requirements
 

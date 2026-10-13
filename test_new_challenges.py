@@ -1,6 +1,8 @@
 """Automated regression tests for the additional challenge definitions."""
 
+import tempfile
 import unittest
+from pathlib import Path
 
 from game.game_state import GameState
 from interpreter.lambda_interpreter import Parser
@@ -8,7 +10,10 @@ from interpreter.lambda_interpreter import Parser
 
 class AdditionalChallengeTests(unittest.TestCase):
     def setUp(self):
-        self.game_state = GameState()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        progress_path = Path(self.temp_dir.name) / "progress.json"
+        self.game_state = GameState(progress_path=progress_path)
         solutions = {
             "ID": r"\x.x",
             "TRUE": r"\x.\y.x",

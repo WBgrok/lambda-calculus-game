@@ -62,7 +62,11 @@ class ConsoleView:
 
         print("\nOptions:")
         print(f"{len(available) + 1}. Free Interpreter")
-        print(f"{len(available) + 2}. Quit\n")
+        if completed:
+            print(f"{len(available) + 2}. New Game (erase saved progress)")
+            print(f"{len(available) + 3}. Quit\n")
+        else:
+            print(f"{len(available) + 2}. Quit\n")
         return input("Enter your choice: ").strip()
 
     def show_invalid_menu_choice(self):
@@ -70,6 +74,15 @@ class ConsoleView:
 
     def show_goodbye(self):
         print("\nThanks for playing! Goodbye!")
+
+    def confirm_new_game(self) -> bool:
+        response = input(
+            "Start a new game and erase saved progress? [y/N]: "
+        ).strip().lower()
+        return response in {"y", "yes"}
+
+    def show_new_game_started(self):
+        print("\nStarting a new game. Saved progress was cleared.")
 
     def show_challenge(
         self,

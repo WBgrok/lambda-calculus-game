@@ -10,6 +10,7 @@ Learn lambda calculus by solving progressive challenges. Write lambda functions 
 - **Step-by-step reduction**: See how your lambda expression evaluates
 - **Free interpreter**: Test expressions before tackling challenges
 - **Progressive challenges**: Unlock harder challenges by completing prerequisite challenges
+- **Saved progress**: Completed challenges and aliases are restored when you relaunch
 
 ## Interpreter Results
 
@@ -42,6 +43,10 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+Progress is saved automatically as JSON in `~/.lambda-calculus-game/progress.json`.
+Choose **New Game** from the main menu to erase the save and start over; the
+game asks for confirmation before clearing it.
 
 ### Running the Tests
 

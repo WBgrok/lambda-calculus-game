@@ -27,18 +27,21 @@ The console rendering and prompts now live in `game/menu.py` as `ConsoleView`; `
 
 ### 3. Stronger evaluation abstractions — implemented
 
-The lambda evaluator is fine for a teaching tool, but the current `parse_and_eval` flow and result handling are not structured enough for deeper validation or future features like richer challenge feedback, debug modes, or persistence.
-
 `parse_and_eval()` now returns an `EvaluationResult` with an immutable trace of `ReductionStep` values. The controller and challenge runner consume this result directly.
 
 ### 4. Better error boundaries — implemented
 
 The interpreter now raises named `LambdaSyntaxError` and `EvaluationLimitError` exceptions. Challenge and interactive interpreter flows catch only those expected user-facing failures, while unexpected exceptions propagate. The top-level entry point no longer catches and re-raises every exception.
 
-### 5. Persistence and tooling — next
+### 5. Persistence — implemented; tooling — in place
 
-The project currently lacks a formal test runner setup in the local environment, and there is no persisted progress model yet. Adding a lightweight save file or SQLite-backed progress system would be a worthwhile next milestone.
+Game progress is automatically saved to `~/.lambda-calculus-game/progress.json` as readable JSON. On startup, completed challenges and their lambda aliases are restored. The main menu offers a confirmation-protected New Game action that removes saved progress. Save/load failures are reported explicitly.
 
-## Immediate next step
+The test suite uses Python's standard-library `unittest` runner; no extra test dependency is needed. Persistence and new-game behavior are covered with temporary save files.
 
-Implement persisted game progress so completed challenges and their aliases survive across runs.
+## Remaining improvement ideas
+
+- Convert challenge-test result dictionaries into a typed result model if their shape grows.
+- Add more challenges or teaching aids (hints, difficulty, scoring) based on actual gameplay needs.
+
+No additional backend or framework is currently justified for this small, local game.
