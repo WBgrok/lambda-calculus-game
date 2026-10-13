@@ -6,7 +6,7 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from game.game_state import GameState
-from game.menu import Menu
+from game.controller import GameController
 from interpreter.lambda_interpreter import Parser
 
 
@@ -61,14 +61,24 @@ class ChallengeTests(unittest.TestCase):
         self.assertIn("PAIR", available_ids)
 
     def test_menu_completes_typed_challenge(self):
-        menu = Menu(self.game_state)
+        controller = GameController(self.game_state)
         with patch("builtins.input", side_effect=[r"\x.\y.x", ""]):
             with redirect_stdout(io.StringIO()):
-                completed = menu.challenge_menu("TRUE")
+                completed = controller.challenge_menu("TRUE")
 
         self.assertTrue(completed)
         self.assertTrue(self.game_state.is_completed("TRUE"))
         self.assertIn("TRUE", self.game_state.get_all_aliases())
+
+    def test_controller_routes_free_interpreter_then_quits(self):
+        controller = GameController(self.game_state)
+        available_count = len(self.game_state.get_available_challenges())
+        with patch(
+            "builtins.input",
+            side_effect=[str(available_count + 1), "", str(available_count + 2)],
+        ):
+            with redirect_stdout(io.StringIO()):
+                controller.run()
 
 
 if __name__ == "__main__":

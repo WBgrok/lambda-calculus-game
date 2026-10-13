@@ -13,17 +13,19 @@ The lambda-calculus game is small, focused, and easy to understand. It has a cle
 
 ## Improvement opportunities
 
-### 1. Typed domain models
+### 1. Typed domain models — started
 
 The code currently relies heavily on raw dictionaries for challenge definitions and test results. This makes the code more fragile than it needs to be and scatters schema assumptions across the project.
 
-Planned improvement: convert challenge/test structures into typed dataclasses while preserving compatibility with existing dictionary-style access (`challenge['id']`) so the current tests and UI continue to work.
+The challenge and challenge-test definitions have been converted to dataclasses while retaining dictionary-style compatibility for existing callers. Test results still use dictionaries and can be migrated in a later pass if their shape needs to grow.
 
-### 2. Separate UI from game logic
+### 2. Separate UI from game logic — implemented
 
 The menu layer currently handles display, input validation, challenge evaluation, and state mutation in one place. Extracting this into a view/controller split would make the project easier to extend and test.
 
-### 3. Stronger evaluation abstractions
+The console rendering and prompts now live in `game/menu.py` as `ConsoleView`; `GameController` in `game/controller.py` owns navigation, challenge evaluation, and state changes.
+
+### 3. Stronger evaluation abstractions — next
 
 The lambda evaluator is fine for a teaching tool, but the current `parse_and_eval` flow and result handling are not structured enough for deeper validation or future features like richer challenge feedback, debug modes, or persistence.
 

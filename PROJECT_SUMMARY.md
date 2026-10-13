@@ -32,9 +32,11 @@ A complete text-based lambda calculus learning game with the following component
 - Loads challenge definitions from JSON
 - Validates challenge requirements
 
-### 4. User Interface (`game/menu.py`)
+### 4. Game Flow and Console UI (`game/controller.py`, `game/menu.py`)
+- **Game Controller**: Handles menu navigation, challenge evaluation, and state changes
+- **Console View**: Renders menus, challenge details, test results, and interpreter output
 - **Main Menu**: Shows available challenges and free interpreter option
-- **Challenge Interface**: 
+- **Challenge Interface**:
   - Displays challenge description
   - Shows available aliases
   - Accepts user solution
@@ -53,9 +55,9 @@ A complete text-based lambda calculus learning game with the following component
 
 ## How to Test It
 
-1. **Run the interpreter tests**:
+1. **Run the automated tests**:
    ```bash
-   python test_interpreter.py
+   python -m unittest discover -v
    ```
 
 2. **Run the game**:
@@ -74,7 +76,8 @@ A complete text-based lambda calculus learning game with the following component
 main.py
   └─> GameState (loads challenges, tracks progress)
       ├─> Challenge (tests solutions)
-      └─> Menu (handles UI/interactions)
+      └─> GameController (coordinates game flow)
+          ├─> ConsoleView (renders and collects console input)
           └─> Evaluator (reduces expressions)
               └─> Parser (parses lambda syntax)
 ```
@@ -146,9 +149,9 @@ main.py
 | `interpreter/lambda_interpreter.py` | Core lambda interpreter |
 | `game/game_state.py` | Session state and challenge loading |
 | `game/challenge.py` | Challenge testing system |
-| `game/menu.py` | UI and game flow |
+| `game/controller.py` | Game flow and actions |
+| `game/menu.py` | Console presentation |
 | `challenges/challenges.json` | Challenge definitions |
 | `test_interpreter.py` | Interpreter verification tests |
 | `README.md` | User-facing documentation |
 | `SETUP.md` | Developer setup and GitHub instructions |
-

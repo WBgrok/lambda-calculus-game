@@ -96,9 +96,10 @@ lambda-calculus-game/
 │   └── lambda_interpreter.py # Core lambda calculus interpreter
 ├── game/
 │   ├── __init__.py
+│   ├── controller.py      # Game flow and actions
 │   ├── game_state.py         # Session state management
 │   ├── challenge.py          # Challenge system
-│   └── menu.py               # UI and menus
+│   └── menu.py               # Console presentation
 └── challenges/
     ├── __init__.py
     └── challenges.json       # Challenge definitions

@@ -57,7 +57,8 @@ lambda-calculus-game/
 ├── interpreter/            # Lambda calculus interpreter
 │   └── lambda_interpreter.py
 ├── game/                   # Game logic
-│   ├── menu.py            # Main menu and UI
+│   ├── controller.py      # Game flow and actions
+│   ├── menu.py            # Console presentation
 │   ├── challenge.py       # Challenge system
 │   └── game_state.py      # Session state
 └── challenges/            # Challenge definitions

@@ -4,7 +4,7 @@ Lambda Calculus Game - Main Entry Point
 """
 
 from game.game_state import GameState
-from game.menu import main_loop
+from game.controller import main_loop
 
 
 def main():
