@@ -7,9 +7,9 @@ Port the curriculum from [`yancouto/functional`](https://github.com/yancouto/fun
 ## Porting notes
 
 - The Rust game defines 57 levels in seven ordered sections.
-- Existing challenges covered 11 Rust levels before this port: Identity, Two arguments (our `SWAP`), Squaring (`SQR`), all five Boolean levels, and Pair, FST, and SND (our `SCD`).
-- `ANYTHING` has been added as a syntax-only introductory challenge; `INDIRECTION` and all Pair and List levels are also implemented.
-- That leaves 39 Rust levels to port, in Recursion through Trees.
+- Existing challenges covered 11 Rust levels before porting began: Identity, Two arguments (our `SWAP`), Squaring (`SQR`), all five Boolean levels, and Pair, FST, and SND (our `SCD`).
+- `ANYTHING` is an added syntax-only introductory challenge. All Basic, Boolean, Pair and List, and Recursion levels are now implemented.
+- That leaves 28 Rust levels to port, in Numerals through Trees.
 - Add section/order metadata before or alongside the larger imports so the curriculum can be presented in Rust's section order. Keep the existing prerequisite-based unlock behavior and consider how older saved progress will behave.
 - Some Rust exercises rely on expression syntax or constants not present here. Translate these into lambda syntax supported by our parser, and test behavior by applying functions to representative inputs rather than relying on exact variable names.
 - Add hints where an exercise introduces a substantial new concept; test edge cases such as empty and singleton lists, zero numerals, and empty trees.
@@ -45,17 +45,17 @@ Port the curriculum from [`yancouto/functional`](https://github.com/yancouto/fun
 
 ### 4. Recursion
 
-- [ ] Creating recursion.
-- [ ] Strip prefix.
-- [ ] Acc.
-- [ ] All.
-- [ ] Map.
-- [ ] None.
-- [ ] Filter.
-- [ ] Zip.
-- [ ] Eqblist.
-- [ ] Concat.
-- [ ] Reverse.
+- [x] Creating recursion — implement the Y combinator (`Y`).
+- [x] Strip prefix — remove leading FALSE values from a boolean list (`STRIP_PREFIX`).
+- [x] Acc — fold a list from an initial value using a combining function (`ACC`).
+- [x] All — check that every boolean in a list is TRUE (`ALL`).
+- [x] Map — apply a function to each list element (`MAP`).
+- [x] None — check that every boolean in a list is FALSE (`NONE`).
+- [x] Filter — retain list elements accepted by a predicate (`FILTER`).
+- [x] Zip — combine corresponding items from two equal-length lists (`ZIP`).
+- [x] Eqblist — compare equal-length boolean lists (`EQBLIST`).
+- [x] Concat — concatenate two lists (`CONCAT`).
+- [x] Reverse — reverse a list using an accumulator (`REVERSE`).
 
 ### 5. Numerals
 

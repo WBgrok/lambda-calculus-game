@@ -232,6 +232,278 @@
     "requirements": ["POP", "PUSH", "TRUE", "FALSE"]
   },
   {
+    "id": "Y",
+    "name": "Creating Recursion",
+    "description": "Write the Y combinator: a function that takes a function F and returns a fixed point of F.\n\nFor any suitable F, Y F reduces to F (Y F). That lets F call itself recursively. The Y combinator itself is a valid expression even though applying it to some functions can continue forever; these tests use recursive functions that reach a base case.",
+    "tests": [
+      {
+        "input": "(\\recur.\\value.value) A",
+        "expected": "A"
+      },
+      {
+        "input": "(\\recur.\\lst.lst (\\head.\\tail.\\dummy.recur tail) TRUE) (PAIR A FALSE)",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(\\recur.\\lst.lst (\\head.\\tail.\\dummy.recur tail) TRUE) (PAIR A (PAIR B (PAIR C FALSE)))",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["EMPTY"]
+  },
+  {
+    "id": "STRIP_PREFIX",
+    "name": "Strip a Boolean Prefix",
+    "description": "Write a recursive function that removes all FALSE values from the beginning of a list of booleans and returns the remaining list. The list is guaranteed to contain at least one TRUE.\n\nFor example, [FALSE, FALSE, TRUE, FALSE] becomes [TRUE, FALSE], while [TRUE, FALSE] is unchanged. Use Y to define the recursion.",
+    "tests": [
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR TRUE (PAIR TRUE (PAIR FALSE FALSE))))) TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR TRUE (PAIR TRUE (PAIR FALSE FALSE))))) FALSE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR TRUE (PAIR TRUE (PAIR FALSE FALSE))))) FALSE FALSE TRUE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE)) TRUE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "POP", "IF", "FST", "SCD"]
+  },
+  {
+    "id": "ACC",
+    "name": "Accumulate a List",
+    "description": "Write a function ACC that takes a list L, a two-argument combining function F, and an initial value I.\n\nStarting with I, apply F to the accumulated value and each list element in turn. Return the final accumulated value. For example, accumulating OR from FALSE over [TRUE, FALSE] returns TRUE; accumulating over an empty list returns the initial value.",
+    "tests": [
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE)) OR FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR FALSE FALSE))) OR FALSE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "FALSE OR FALSE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) XOR FALSE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE)) XOR FALSE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "EMPTY"]
+  },
+  {
+    "id": "ALL",
+    "name": "All True in a List",
+    "description": "Write a function that takes a list of booleans and returns TRUE only if every item is TRUE. The empty list should return TRUE: every item in an empty list satisfies the condition.",
+    "tests": [
+      {
+        "input": "FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR TRUE (PAIR TRUE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR (XOR TRUE FALSE) (PAIR (OR FALSE TRUE) FALSE))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))))",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["ACC", "AND"]
+  },
+  {
+    "id": "MAP",
+    "name": "Map a Function over a List",
+    "description": "Write MAP to take a list L and a function F, and return a list containing F applied to each element of L.\n\nFor example, mapping NOT over [TRUE, FALSE] returns [FALSE, TRUE]. The empty list maps to the empty list.",
+    "tests": [
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) NOT TRUE",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) NOT FALSE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE NOT (\\head.\\tail.\\dummy.FALSE) TRUE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "PUSH"]
+  },
+  {
+    "id": "NONE",
+    "name": "No True Values",
+    "description": "Write a function that takes a list of booleans and returns TRUE if every item is FALSE, and FALSE if any item is TRUE. The empty list returns TRUE.",
+    "tests": [
+      {
+        "input": "FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR FALSE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR TRUE (PAIR FALSE FALSE))))",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["Y"]
+  },
+  {
+    "id": "FILTER",
+    "name": "Filter a List",
+    "description": "Write FILTER to take a list L and a predicate F, and return the list of elements for which F returns TRUE. The predicate always returns a Church boolean.\n\nFor example, filtering [TRUE, FALSE, TRUE] with the identity function returns [TRUE, TRUE].",
+    "tests": [
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) (\\value.value) TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) (\\value.value) FALSE TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE))) (\\value.FALSE) (\\head.\\tail.\\dummy.FALSE) TRUE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "FALSE (\\value.value) (\\head.\\tail.\\dummy.FALSE) TRUE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "PUSH"]
+  },
+  {
+    "id": "ZIP",
+    "name": "Zip Two Lists",
+    "description": "Write ZIP to take two lists of equal length and return a list of pairs, combining corresponding elements.\n\nFor example, ZIP [A, B] [C, D] returns [(A, C), (B, D)].",
+    "tests": [
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C (PAIR D FALSE)) TRUE TRUE",
+        "expected": "A"
+      },
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C (PAIR D FALSE)) TRUE FALSE",
+        "expected": "C"
+      },
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C (PAIR D FALSE)) FALSE TRUE TRUE",
+        "expected": "B"
+      },
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C (PAIR D FALSE)) FALSE TRUE FALSE",
+        "expected": "D"
+      },
+      {
+        "input": "FALSE FALSE (\\head.\\tail.\\dummy.FALSE) TRUE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "PUSH", "PAIR"]
+  },
+  {
+    "id": "EQBLIST",
+    "name": "Compare Boolean Lists",
+    "description": "Write EQBLIST to compare two boolean lists of equal length. Return TRUE if they contain the same values in the same order, and FALSE otherwise.",
+    "tests": [
+      {
+        "input": "FALSE FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE)) (PAIR (OR TRUE FALSE) (PAIR (AND TRUE FALSE) FALSE))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE FALSE)) (PAIR TRUE (PAIR TRUE FALSE))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE (PAIR TRUE FALSE)))) (PAIR TRUE (PAIR FALSE (PAIR TRUE (PAIR FALSE FALSE))))",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["Y", "AND", "NOT", "XOR"]
+  },
+  {
+    "id": "CONCAT",
+    "name": "Concatenate Lists",
+    "description": "Write CONCAT to join two lists, keeping all elements of the first list before all elements of the second.\n\nFor example, CONCAT [A, B] [C] returns [A, B, C].",
+    "tests": [
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C FALSE) TRUE",
+        "expected": "A"
+      },
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C FALSE) FALSE TRUE",
+        "expected": "B"
+      },
+      {
+        "input": "(PAIR A (PAIR B FALSE)) (PAIR C FALSE) FALSE FALSE TRUE",
+        "expected": "C"
+      },
+      {
+        "input": "FALSE (PAIR C FALSE) TRUE",
+        "expected": "C"
+      }
+    ],
+    "requirements": ["Y", "PUSH"]
+  },
+  {
+    "id": "REVERSE",
+    "name": "Reverse a List",
+    "description": "Write REVERSE to return a list with its elements in reverse order. The empty list and single-element lists should also work.",
+    "tests": [
+      {
+        "input": "(PAIR A (PAIR B (PAIR C FALSE))) TRUE",
+        "expected": "C"
+      },
+      {
+        "input": "(PAIR A (PAIR B (PAIR C FALSE))) FALSE TRUE",
+        "expected": "B"
+      },
+      {
+        "input": "(PAIR A (PAIR B (PAIR C FALSE))) FALSE FALSE TRUE",
+        "expected": "A"
+      },
+      {
+        "input": "(PAIR A FALSE) TRUE",
+        "expected": "A"
+      },
+      {
+        "input": "FALSE (\\head.\\tail.\\dummy.FALSE) TRUE",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["Y", "PUSH"]
+  },
+  {
     "id": "SWAP",
     "name": "Swap Arguments",
     "description": "Write a function that takes two arguments and returns them in reverse order.\n\nSWAP A B should evaluate to B A\n\nThis requires careful use of bracketing since application is left-associative.",

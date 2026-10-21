@@ -25,11 +25,63 @@ class AdditionalChallengeTests(unittest.TestCase):
             "SWAP": r"\x.\y.y x",
             "SQR": r"\f.\x.f (f x)",
             "OR": r"\p.\q.p TRUE q",
+            "AND": r"\p.\q.p q FALSE",
+            "XOR": r"\p.\q.p (q FALSE TRUE) (q TRUE FALSE)",
+            "NOT": r"\b.b FALSE TRUE",
+            "IF": r"\b.\a.\c.b a c",
             "SIMPLE_LIST": r"\lst.FST (SCD (SCD lst))",
             "ANY": r"\lst.OR (FST lst) (OR (FST (SCD lst)) (FST (SCD (SCD lst))))",
             "PUSH": r"\item.\lst.PAIR item lst",
             "POP": r"\lst.SCD lst",
             "EMPTY": r"\lst.lst (\head.\tail.\ignored.FALSE) TRUE",
+            "Y": r"\f.(\x.f (x x)) (\x.f (x x))",
+            "STRIP_PREFIX": r"Y (\rec.\lst.IF (FST lst) lst (rec (SCD lst)))",
+            "ACC": (
+                r"\lst.\combine.\initial."
+                r"Y (\rec.\remaining.\acc."
+                r"remaining (\head.\tail.\dummy.rec tail (combine acc head)) acc)"
+                r" lst initial"
+            ),
+            "ALL": r"\lst.ACC lst AND TRUE",
+            "MAP": (
+                r"\lst.\transform."
+                r"Y (\rec.\remaining."
+                r"remaining (\head.\tail.\dummy.PUSH (transform head) (rec tail)) FALSE)"
+                r" lst"
+            ),
+            "NONE": (
+                r"Y (\rec.\lst."
+                r"lst (\head.\tail.\dummy.head FALSE (rec tail)) TRUE)"
+            ),
+            "FILTER": (
+                r"\lst.\predicate."
+                r"Y (\rec.\remaining."
+                r"remaining ("
+                r"\head.\tail.\dummy."
+                r"predicate head (PUSH head (rec tail)) (rec tail)"
+                r") FALSE) lst"
+            ),
+            "ZIP": (
+                r"Y (\rec.\left.\right."
+                r"left (\head.\tail.\dummy."
+                r"PUSH (PAIR head (right TRUE)) (rec tail (right FALSE))"
+                r") FALSE)"
+            ),
+            "EQBLIST": (
+                r"Y (\rec.\left.\right."
+                r"left (\head.\tail.\dummy."
+                r"AND (NOT (XOR head (right TRUE))) (rec tail (right FALSE))"
+                r") TRUE)"
+            ),
+            "CONCAT": (
+                r"Y (\rec.\left.\right."
+                r"left (\head.\tail.\dummy.PUSH head (rec tail right)) right)"
+            ),
+            "REVERSE": (
+                r"\lst.Y (\rec.\remaining.\acc."
+                r"remaining (\head.\tail.\dummy.rec tail (PUSH head acc)) acc)"
+                r" lst FALSE"
+            ),
         }
         for challenge_id, source in solutions.items():
             solution = Parser(
@@ -92,6 +144,87 @@ class AdditionalChallengeTests(unittest.TestCase):
             r"\lst.lst (\head.\tail.\ignored.FALSE) TRUE",
         )
 
+    def test_y_combinator_challenge(self):
+        self.assert_challenge_passes("Y", r"\f.(\x.f (x x)) (\x.f (x x))")
+
+    def test_strip_prefix_challenge(self):
+        self.assert_challenge_passes(
+            "STRIP_PREFIX",
+            r"Y (\rec.\lst.IF (FST lst) lst (rec (SCD lst)))",
+        )
+
+    def test_accumulate_challenge(self):
+        self.assert_challenge_passes(
+            "ACC",
+            r"\lst.\combine.\initial."
+            r"Y (\rec.\remaining.\acc."
+            r"remaining (\head.\tail.\dummy.rec tail (combine acc head)) acc)"
+            r" lst initial",
+        )
+
+    def test_all_true_challenge(self):
+        self.assert_challenge_passes("ALL", r"\lst.ACC lst AND TRUE")
+
+    def test_map_challenge(self):
+        self.assert_challenge_passes(
+            "MAP",
+            r"\lst.\transform."
+            r"Y (\rec.\remaining."
+            r"remaining (\head.\tail.\dummy.PUSH (transform head) (rec tail)) FALSE)"
+            r" lst",
+        )
+
+    def test_no_true_values_challenge(self):
+        self.assert_challenge_passes(
+            "NONE",
+            r"Y (\rec.\lst."
+            r"lst (\head.\tail.\dummy.head FALSE (rec tail)) TRUE)",
+        )
+
+    def test_filter_challenge(self):
+        self.assert_challenge_passes(
+            "FILTER",
+            r"\lst.\predicate."
+            r"Y (\rec.\remaining."
+            r"remaining ("
+            r"\head.\tail.\dummy."
+            r"predicate head (PUSH head (rec tail)) (rec tail)"
+            r") FALSE) lst",
+        )
+
+    def test_zip_challenge(self):
+        self.assert_challenge_passes(
+            "ZIP",
+            r"Y (\rec.\left.\right."
+            r"left (\head.\tail.\dummy."
+            r"PUSH (PAIR head (right TRUE)) (rec tail (right FALSE))"
+            r") FALSE)",
+        )
+
+    def test_equal_boolean_lists_challenge(self):
+        self.assert_challenge_passes(
+            "EQBLIST",
+            r"Y (\rec.\left.\right."
+            r"left (\head.\tail.\dummy."
+            r"AND (NOT (XOR head (right TRUE))) (rec tail (right FALSE))"
+            r") TRUE)",
+        )
+
+    def test_concatenate_lists_challenge(self):
+        self.assert_challenge_passes(
+            "CONCAT",
+            r"Y (\rec.\left.\right."
+            r"left (\head.\tail.\dummy.PUSH head (rec tail right)) right)",
+        )
+
+    def test_reverse_list_challenge(self):
+        self.assert_challenge_passes(
+            "REVERSE",
+            r"\lst.Y (\rec.\remaining.\acc."
+            r"remaining (\head.\tail.\dummy.rec tail (PUSH head acc)) acc)"
+            r" lst FALSE",
+        )
+
     def test_boolean_and_challenge(self):
         self.assert_challenge_passes("AND", r"\p.\q.p q FALSE")
 
@@ -151,6 +284,8 @@ class AdditionalChallengeTests(unittest.TestCase):
                 "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SIMPLE_LIST",
                 "ANY", "PUSH", "POP", "EMPTY", "SWAP",
                 "SQR", "INDIRECTION", "IF", "NOT", "AND", "OR", "XOR",
+                "Y", "STRIP_PREFIX", "ACC", "ALL", "MAP", "NONE", "FILTER",
+                "ZIP", "EQBLIST", "CONCAT", "REVERSE",
             },
         )
         for challenge in self.game_state.challenges_data:
