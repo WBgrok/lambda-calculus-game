@@ -29,6 +29,7 @@ const progressCount = document.querySelector("#progress-count");
 let pyodide;
 let gameState;
 let selectedChallengeId;
+let gameReady = false;
 
 function showError(error) {
   statusElement.textContent = error instanceof Error ? error.message : String(error);
@@ -79,7 +80,9 @@ async function loadPythonFiles() {
 }
 
 function callBridge(code) {
-  const rawResult = pyodide.runPython(code);
+  const rawResult = pyodide.runPython(
+    `import web.bridge as browser_bridge\n${code}`
+  );
   return JSON.parse(rawResult);
 }
 
@@ -224,9 +227,9 @@ function addExpression(parent, label, value) {
 }
 
 function setBusy(isBusy) {
-  submitButton.disabled = isBusy || !gameState;
-  evaluateButton.disabled = isBusy || !gameState;
-  newGameButton.disabled = isBusy || !gameState || gameState.completed_count === 0;
+  submitButton.disabled = isBusy || !gameReady;
+  evaluateButton.disabled = isBusy || !gameReady;
+  newGameButton.disabled = isBusy || !gameReady || gameState.completed_count === 0;
 }
 
 function submitOnEnter(textarea, form) {
@@ -236,6 +239,7 @@ function submitOnEnter(textarea, form) {
       && !event.shiftKey
       && !event.isComposing
       && !event.repeat
+      && gameReady
     ) {
       event.preventDefault();
       form.requestSubmit();
@@ -247,7 +251,6 @@ async function initializeGame(challengeJson, savedProgressJson) {
   pyodide.globals.set("browser_challenge_json", challengeJson);
   pyodide.globals.set("browser_progress_json", savedProgressJson);
   return callBridge(
-    "import web.bridge as browser_bridge; " +
     "browser_bridge.initialize(browser_challenge_json, browser_progress_json)"
   );
 }
@@ -281,6 +284,7 @@ async function start() {
       state = await initializeGame(challengeJson, savedProgress);
     }
     clearError();
+    gameReady = true;
     renderState(state);
     evaluateButton.disabled = false;
   } catch (error) {
@@ -304,6 +308,9 @@ submitOnEnter(expressionInput, interpreterForm);
 
 solutionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!gameReady) {
+    return;
+  }
   clearError();
   if (!solutionInput.value.trim()) {
     expressionInput.focus();
@@ -333,6 +340,9 @@ solutionForm.addEventListener("submit", async (event) => {
 
 interpreterForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!gameReady) {
+    return;
+  }
   clearError();
   if (!expressionInput.value.trim()) {
     expressionInput.focus();

@@ -26,17 +26,25 @@ Open <http://localhost:8000/web/>. Do not open `web/index.html` directly with a
 
 ### Deploy with GitHub Pages
 
-1. Open the repository's **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select the branch containing the published version of the game and choose
-   `/(root)` as the folder.
-4. Save the settings and wait for Pages to finish publishing.
+1. Push the project to GitHub.
+2. Open the repository's **Settings → Pages**.
+3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+4. Push to `master` or manually run **Deploy game to GitHub Pages** from the
+   **Actions** tab.
 5. Open the published site URL with `/web/` appended, for example:
    `https://OWNER.github.io/REPOSITORY/web/`.
 
-Publish the repository root, not only the `web/` directory. The browser loads
-`game/`, `interpreter/`, and `challenges/` from sibling paths. A custom domain
-can point to the same `/web/` path.
+The workflow assembles and publishes the static files needed by the game:
+`web/`, `game/`, `interpreter/`, and `challenges/`. Keep these assets at their
+relative paths in the published artifact; the browser fetches Python modules
+and challenge JSON from beside the web UI. A custom domain can use the same
+`/web/` path.
+
+If the game reports that a Python module or challenge JSON returns HTTP 404,
+check that the published site contains the requested file. For a project named
+`REPOSITORY`, for example,
+`https://OWNER.github.io/REPOSITORY/game/__init__.py` should return the module
+contents.
 
 The Pyodide runtime is fetched from its pinned CDN release, so the browser needs
 network access to that CDN when starting the game. Challenge data is fetched

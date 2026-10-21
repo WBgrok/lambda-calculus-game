@@ -1,0 +1,52 @@
+name: Deploy game to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Assemble static site
+        run: |
+          mkdir -p _site/web _site/game _site/interpreter _site/challenges
+          cp web/index.html web/app.js web/style.css _site/web/
+          cp web/__init__.py web/bridge.py _site/web/
+          cp game/*.py _site/game/
+          cp interpreter/*.py _site/interpreter/
+          cp challenges/challenges.json _site/challenges/
+          test -s _site/web/index.html
+          test -s _site/web/bridge.py
+          test -s _site/game/__init__.py
+          test -s _site/interpreter/lambda_interpreter.py
+          test -s _site/challenges/challenges.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
