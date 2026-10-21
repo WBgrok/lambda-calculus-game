@@ -229,6 +229,20 @@ function setBusy(isBusy) {
   newGameButton.disabled = isBusy || !gameState || gameState.completed_count === 0;
 }
 
+function submitOnEnter(textarea, form) {
+  textarea.addEventListener("keydown", (event) => {
+    if (
+      event.key === "Enter"
+      && !event.shiftKey
+      && !event.isComposing
+      && !event.repeat
+    ) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+}
+
 async function initializeGame(challengeJson, savedProgressJson) {
   pyodide.globals.set("browser_challenge_json", challengeJson);
   pyodide.globals.set("browser_progress_json", savedProgressJson);
@@ -284,6 +298,9 @@ challengeList.addEventListener("click", (event) => {
   solutionInput.value = "";
   renderState(gameState);
 });
+
+submitOnEnter(solutionInput, solutionForm);
+submitOnEnter(expressionInput, interpreterForm);
 
 solutionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
