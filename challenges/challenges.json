@@ -1,5 +1,13 @@
 [
   {
+    "id": "ANYTHING",
+    "name": "Anything",
+    "description": "Write any valid lambda-calculus expression. It can be a variable, a function, or an application.\n\nExamples: x, \\x.x, or (\\x.x) y.\n\nThis first exercise checks that your expression is well-formed; it does not require a particular result.",
+    "tests": [],
+    "validation_only": true,
+    "requirements": []
+  },
+  {
     "id": "ID",
     "name": "Identity",
     "description": "Write a function that returns its input unchanged.\n\nThis is the simplest possible lambda function. Just pass through the argument.",
@@ -126,6 +134,26 @@
       }
     ],
     "requirements": ["ID", "SWAP"]
+  },
+  {
+    "id": "INDIRECTION",
+    "name": "Swap a Function's Arguments",
+    "description": "Write a function that takes a two-argument function F and two values A and B, then applies F to B and A in that order.\n\nINDIRECTION F A B should evaluate to F B A.\n\nThis differs from SWAP: SWAP returns its two inputs in reverse order, while this challenge swaps the arguments passed to another function.",
+    "tests": [
+      {
+        "input": "(\\a.\\b.a b) C D",
+        "expected": "D C"
+      },
+      {
+        "input": "(\\a.\\b.a a) A B",
+        "expected": "B B"
+      },
+      {
+        "input": "(\\a.\\b.a b) A (\\x.x)",
+        "expected": "A"
+      }
+    ],
+    "requirements": ["SQR"]
   },
   {
     "id": "IF",

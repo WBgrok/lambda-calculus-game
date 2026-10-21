@@ -110,9 +110,17 @@ class ChallengeTests(unittest.TestCase):
     def test_confirmed_new_game_clears_saved_progress(self):
         controller = GameController(self.game_state)
         available_count = len(self.game_state.get_available_challenges())
+        initial_available_count = sum(
+            not challenge.requirements
+            for challenge in self.game_state.challenges_data
+        )
         with patch(
             "builtins.input",
-            side_effect=[str(available_count + 2), "y", "3"],
+            side_effect=[
+                str(available_count + 2),
+                "y",
+                str(initial_available_count + 2),
+            ],
         ):
             with redirect_stdout(io.StringIO()):
                 controller.run()

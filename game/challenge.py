@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 from interpreter.lambda_interpreter import (
     EvaluationLimitError,
     LambdaSyntaxError,
+    Parser,
     parse_and_eval,
 )
 
@@ -54,6 +55,7 @@ class Challenge:
     name: str
     description: str
     tests: List[ChallengeTest] = field(default_factory=list)
+    validation_only: bool = False
     requirements: List[str] = field(default_factory=list)
 
     def __post_init__(self):
@@ -71,6 +73,7 @@ class Challenge:
                 ChallengeTest.from_dict(test)
                 for test in challenge_dict.get("tests", [])
             ],
+            validation_only=bool(challenge_dict.get("validation_only", False)),
             requirements=list(challenge_dict.get("requirements", [])),
         )
 
@@ -81,6 +84,7 @@ class Challenge:
             "name": self.name,
             "description": self.description,
             "tests": [test.as_dict() for test in self.tests],
+            "validation_only": self.validation_only,
             "requirements": list(self.requirements),
         }
 
@@ -98,6 +102,28 @@ class Challenge:
         Returns: (all_passed, results)
         where results is list of {passed, input, expected, actual, error}
         """
+        if self.validation_only:
+            try:
+                expression = Parser(user_solution, aliases).parse()
+            except LambdaSyntaxError as exc:
+                return False, [{
+                    'passed': False,
+                    'input': user_solution,
+                    'expected': 'A valid lambda expression',
+                    'actual': None,
+                    'error': f"{type(exc).__name__}: {exc}",
+                    'steps': [],
+                }]
+
+            return True, [{
+                'passed': True,
+                'input': user_solution,
+                'expected': 'Any valid lambda expression',
+                'actual': str(expression),
+                'error': None,
+                'steps': [],
+            }]
+
         try:
             parse_and_eval(user_solution, aliases)
         except (LambdaSyntaxError, EvaluationLimitError) as exc:

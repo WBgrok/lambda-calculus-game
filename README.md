@@ -10,8 +10,9 @@ The browser edition runs as a static site. It uses Pyodide to run the project's
 Python parser, evaluator, and challenge logic; it does not need a backend,
 database, frontend build, or installed Python runtime.
 
-Once GitHub Pages is enabled, open the published repository URL with `/web/`
-appended.
+The browser game is published at
+<https://wbgrok.github.io/lambda-calculus-game/web/>. Its deployment requires
+the GitHub Actions workflow described below to complete successfully.
 
 ### Run locally
 
@@ -31,8 +32,8 @@ Open <http://localhost:8000/web/>. Do not open `web/index.html` directly with a
 3. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 4. Push to `master` or manually run **Deploy game to GitHub Pages** from the
    **Actions** tab.
-5. Open the published site URL with `/web/` appended, for example:
-   `https://OWNER.github.io/REPOSITORY/web/`.
+5. Wait for the workflow run to succeed, then open the published site at
+   <https://wbgrok.github.io/lambda-calculus-game/web/>.
 
 The workflow assembles and publishes the static files needed by the game:
 `web/`, `game/`, `interpreter/`, and `challenges/`. Keep these assets at their
@@ -41,10 +42,13 @@ and challenge JSON from beside the web UI. A custom domain can use the same
 `/web/` path.
 
 If the game reports that a Python module or challenge JSON returns HTTP 404,
-check that the published site contains the requested file. For a project named
-`REPOSITORY`, for example,
-`https://OWNER.github.io/REPOSITORY/game/__init__.py` should return the module
-contents.
+check that the latest **Deploy game to GitHub Pages** workflow run succeeded
+and that Pages is configured to use **GitHub Actions** as its source. Verify
+that
+<https://wbgrok.github.io/lambda-calculus-game/game/__init__.py> returns the
+module contents. If it returns 404, Pages is still serving an artifact that
+does not include the Python files; the browser cannot initialize until a
+correct artifact is deployed.
 
 The Pyodide runtime is fetched from its pinned CDN release, so the browser needs
 network access to that CDN when starting the game. Challenge data is fetched
@@ -66,7 +70,7 @@ from the main menu and confirm to clear the save.
 
 ## Progress and game behavior
 
-The game includes thirteen challenges with prerequisite-based unlocking.
+The game includes fifteen challenges with prerequisite-based unlocking.
 Completed challenge solutions can be reused by their challenge IDs as aliases.
 The free interpreter shows a reduction trace for any valid expression.
 
@@ -89,6 +93,8 @@ progress.
 Challenge definitions live in [`challenges/challenges.json`](challenges/challenges.json).
 Each entry contains an `id`, `name`, `description`, a list of tests (`input`
 and `expected` expressions), and optional prerequisite IDs in `requirements`.
+Set `validation_only` to `true` for a challenge that accepts any well-formed
+expression without evaluating it against test cases.
 The browser fetches this JSON at runtime, so challenge content can be updated
 independently from the frontend.
 

@@ -16,14 +16,14 @@ class WebBridgeTests(unittest.TestCase):
         self.challenge_json = challenge_path.read_text(encoding="utf-8")
         self.state = json.loads(bridge.initialize(self.challenge_json))
 
-    def test_catalog_starts_with_only_the_identity_challenge_unlocked(self):
+    def test_catalog_starts_with_the_introductory_challenges_unlocked(self):
         available = [
             challenge["id"]
             for challenge in self.state["challenges"]
             if challenge["unlocked"]
         ]
 
-        self.assertEqual(available, ["ID"])
+        self.assertEqual(available, ["ANYTHING", "ID"])
         self.assertEqual(self.state["progress"]["completed_challenges"], [])
 
     def test_solution_results_have_json_friendly_steps_and_update_progress(self):
@@ -31,7 +31,12 @@ class WebBridgeTests(unittest.TestCase):
 
         self.assertTrue(result["all_passed"])
         self.assertEqual(result["progress"]["completed_challenges"], ["ID"])
-        self.assertTrue(result["state"]["challenges"][0]["completed"])
+        identity = next(
+            challenge
+            for challenge in result["state"]["challenges"]
+            if challenge["id"] == "ID"
+        )
+        self.assertTrue(identity["completed"])
         self.assertIsInstance(result["results"][0]["steps"][0]["expression"], str)
 
     def test_failed_solution_does_not_update_progress(self):
@@ -55,7 +60,12 @@ class WebBridgeTests(unittest.TestCase):
         state = json.loads(bridge.initialize(self.challenge_json, progress))
 
         self.assertEqual(state["completed_count"], 1)
-        self.assertTrue(state["challenges"][1]["unlocked"])
+        conditional = next(
+            challenge
+            for challenge in state["challenges"]
+            if challenge["id"] == "TRUE"
+        )
+        self.assertTrue(conditional["unlocked"])
         result = json.loads(bridge.evaluate_expression("ID apple"))
         self.assertEqual(result["final_expression"], "apple")
 

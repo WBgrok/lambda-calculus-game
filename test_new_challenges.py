@@ -21,6 +21,7 @@ class AdditionalChallengeTests(unittest.TestCase):
             "FALSE": r"\x.\y.y",
             "PAIR": r"\a.\b.\f.f a b",
             "SWAP": r"\x.\y.y x",
+            "SQR": r"\f.\x.f (f x)",
         }
         for challenge_id, source in solutions.items():
             self.game_state.complete_challenge(challenge_id, Parser(source).parse())
@@ -84,18 +85,40 @@ class AdditionalChallengeTests(unittest.TestCase):
     def test_apply_twice_challenge(self):
         self.assert_challenge_passes("SQR", r"\f.\x.f (f x)")
 
+    def test_indirection_challenge(self):
+        self.assert_challenge_passes(
+            "INDIRECTION",
+            r"\f.\a.\b.f b a",
+        )
+
+    def test_anything_challenge_accepts_any_valid_expression(self):
+        self.assert_challenge_passes("ANYTHING", r"\x.x x")
+        self.assert_challenge_passes("ANYTHING", "free_variable")
+
+    def test_anything_challenge_rejects_invalid_expression(self):
+        challenge = self.game_state.get_challenge("ANYTHING")
+
+        passed, results = challenge.test_solution(
+            r"\x.",
+            self.game_state.get_all_aliases(),
+        )
+
+        self.assertFalse(passed)
+        self.assertIn("LambdaSyntaxError", results[0]["error"])
+
     def test_catalog_requirements_reference_known_challenges(self):
         challenge_ids = {challenge.id for challenge in self.game_state.challenges_data}
         self.assertEqual(
             challenge_ids,
             {
+                "ANYTHING",
                 "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SWAP",
-                "SQR", "IF", "NOT", "AND", "OR", "XOR",
+                "SQR", "INDIRECTION", "IF", "NOT", "AND", "OR", "XOR",
             },
         )
         for challenge in self.game_state.challenges_data:
             with self.subTest(challenge=challenge.id):
-                self.assertTrue(challenge.tests)
+                self.assertTrue(challenge.tests or challenge.validation_only)
                 self.assertTrue(set(challenge.requirements).issubset(challenge_ids))
 
 
