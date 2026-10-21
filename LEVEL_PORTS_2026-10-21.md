@@ -8,8 +8,8 @@ Port the curriculum from [`yancouto/functional`](https://github.com/yancouto/fun
 
 - The Rust game defines 57 levels in seven ordered sections.
 - Existing challenges covered 11 Rust levels before this port: Identity, Two arguments (our `SWAP`), Squaring (`SQR`), all five Boolean levels, and Pair, FST, and SND (our `SCD`).
-- `ANYTHING` has been added as a syntax-only introductory challenge, and `INDIRECTION` is now implemented.
-- That leaves 44 Rust levels to port, in Pair and List through Trees.
+- `ANYTHING` has been added as a syntax-only introductory challenge; `INDIRECTION` and `SIMPLE_LIST` are also implemented.
+- That leaves 43 Rust levels to port, in Pair and List through Trees.
 - Add section/order metadata before or alongside the larger imports so the curriculum can be presented in Rust's section order. Keep the existing prerequisite-based unlock behavior and consider how older saved progress will behave.
 - Some Rust exercises rely on expression syntax or constants not present here. Translate these into lambda syntax supported by our parser, and test behavior by applying functions to representative inputs rather than relying on exact variable names.
 - Add hints where an exercise introduces a substantial new concept; test edge cases such as empty and singleton lists, zero numerals, and empty trees.
@@ -37,7 +37,7 @@ Port the curriculum from [`yancouto/functional`](https://github.com/yancouto/fun
 - [x] Pair — `PAIR`.
 - [x] First projection — `FST`.
 - [x] Second projection — `SCD` (Rust calls this `snd`).
-- [ ] Simple list.
+- [x] Simple list — traverse pair-encoded lists and return the third item (`SIMPLE_LIST`).
 - [ ] Any.
 - [ ] Push.
 - [ ] Pop.

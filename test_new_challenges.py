@@ -20,11 +20,17 @@ class AdditionalChallengeTests(unittest.TestCase):
             "TRUE": r"\x.\y.x",
             "FALSE": r"\x.\y.y",
             "PAIR": r"\a.\b.\f.f a b",
+            "FST": r"\p.p TRUE",
+            "SCD": r"\p.p FALSE",
             "SWAP": r"\x.\y.y x",
             "SQR": r"\f.\x.f (f x)",
         }
         for challenge_id, source in solutions.items():
-            self.game_state.complete_challenge(challenge_id, Parser(source).parse())
+            solution = Parser(
+                source,
+                self.game_state.get_all_aliases(),
+            ).parse()
+            self.game_state.complete_challenge(challenge_id, solution)
 
     def assert_challenge_passes(self, challenge_id, solution):
         challenge = self.game_state.get_challenge(challenge_id)
@@ -55,6 +61,12 @@ class AdditionalChallengeTests(unittest.TestCase):
     def test_first_and_second_pair_projection_challenges(self):
         self.assert_challenge_passes("FST", r"\p.p TRUE")
         self.assert_challenge_passes("SCD", r"\p.p FALSE")
+
+    def test_simple_list_returns_third_element(self):
+        self.assert_challenge_passes(
+            "SIMPLE_LIST",
+            r"\lst.FST (SCD (SCD lst))",
+        )
 
     def test_boolean_and_challenge(self):
         self.assert_challenge_passes("AND", r"\p.\q.p q FALSE")
@@ -112,7 +124,7 @@ class AdditionalChallengeTests(unittest.TestCase):
             challenge_ids,
             {
                 "ANYTHING",
-                "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SWAP",
+                "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SIMPLE_LIST", "SWAP",
                 "SQR", "INDIRECTION", "IF", "NOT", "AND", "OR", "XOR",
             },
         )

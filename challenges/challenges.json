@@ -104,6 +104,22 @@
     "requirements": ["ID", "PAIR", "FALSE"]
   },
   {
+    "id": "SIMPLE_LIST",
+    "name": "Simple List",
+    "description": "A simple list can be built from pairs. The empty list is FALSE, and a non-empty list is a PAIR containing its first element and the rest of the list.\n\nFor example, a list of two elements is PAIR first (PAIR second FALSE).\n\nWrite a function that takes a list of five elements and returns its third element. You can use PAIR to build lists and FST and SCD to inspect them.",
+    "tests": [
+      {
+        "input": "(PAIR a (PAIR b (PAIR c (PAIR d (PAIR e FALSE)))))",
+        "expected": "c"
+      },
+      {
+        "input": "(PAIR red (PAIR green (PAIR blue (PAIR white (PAIR black FALSE)))))",
+        "expected": "blue"
+      }
+    ],
+    "requirements": ["PAIR", "FST", "SCD"]
+  },
+  {
     "id": "SWAP",
     "name": "Swap Arguments",
     "description": "Write a function that takes two arguments and returns them in reverse order.\n\nSWAP A B should evaluate to B A\n\nThis requires careful use of bracketing since application is left-associative.",
