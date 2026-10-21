@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, List, Mapping, Optional, Set
 
 from game.challenge import Challenge
 from interpreter.lambda_interpreter import Expr, LambdaSyntaxError, Parser
@@ -23,15 +23,27 @@ class GameState:
 
     PROGRESS_VERSION = 1
 
-    def __init__(self, progress_path: Optional[Path] = None):
+    def __init__(
+        self,
+        progress_path: Optional[Path] = None,
+        challenges_data: Optional[List[Mapping[str, Any]]] = None,
+        auto_save: bool = True,
+    ):
         self.completed_challenges: Set[str] = set()
         self.aliases: Dict[str, Expr] = {}
         self.challenges_data: list[Challenge] = []
+        self.auto_save = auto_save
         self.progress_path = progress_path or (
             Path.home() / ".lambda-calculus-game" / "progress.json"
         )
-        self._load_challenges()
-        self._load_progress()
+        if challenges_data is None:
+            self._load_challenges()
+        else:
+            self.challenges_data = [
+                Challenge.from_dict(challenge) for challenge in challenges_data
+            ]
+        if self.auto_save:
+            self._load_progress()
 
     def _load_challenges(self):
         """Load challenges from JSON as typed challenge objects."""
@@ -73,24 +85,47 @@ class GameState:
         if challenge_id not in self.completed_challenges:
             self.completed_challenges.add(challenge_id)
             self.aliases[challenge_id] = solution
-            try:
-                self._save_progress()
-            except ProgressSaveError:
-                self.completed_challenges.remove(challenge_id)
-                self.aliases.pop(challenge_id, None)
-                raise
+            if self.auto_save:
+                try:
+                    self._save_progress()
+                except ProgressSaveError:
+                    self.completed_challenges.remove(challenge_id)
+                    self.aliases.pop(challenge_id, None)
+                    raise
 
     def reset_progress(self):
         """Clear saved and in-memory challenge progress."""
-        try:
-            self.progress_path.unlink(missing_ok=True)
-        except OSError as exc:
-            raise ProgressSaveError(
-                f"Could not remove saved progress at {self.progress_path}: {exc}"
-            ) from exc
+        if self.auto_save:
+            try:
+                self.progress_path.unlink(missing_ok=True)
+            except OSError as exc:
+                raise ProgressSaveError(
+                    f"Could not remove saved progress at {self.progress_path}: {exc}"
+                ) from exc
 
         self.completed_challenges.clear()
         self.aliases.clear()
+
+    def get_progress_data(self) -> Dict[str, Any]:
+        """Return the current progress in the versioned save-file format."""
+        return {
+            "version": self.PROGRESS_VERSION,
+            "completed_challenges": sorted(self.completed_challenges),
+            "aliases": {
+                challenge_id: str(self.aliases[challenge_id])
+                for challenge_id in sorted(self.completed_challenges)
+            },
+        }
+
+    def restore_progress_data(self, data: Any):
+        """Validate and restore progress supplied by a non-file storage layer."""
+        try:
+            completed, aliases = self._parse_progress(data)
+        except (KeyError, TypeError, ValueError, LambdaSyntaxError) as exc:
+            raise ProgressLoadError(f"Invalid saved progress: {exc}") from exc
+
+        self.completed_challenges = completed
+        self.aliases = aliases
 
     def _load_progress(self):
         """Restore challenge completion and aliases from the save file."""
@@ -160,14 +195,7 @@ class GameState:
 
     def _save_progress(self):
         """Write current progress as a readable JSON text file."""
-        data = {
-            "version": self.PROGRESS_VERSION,
-            "completed_challenges": sorted(self.completed_challenges),
-            "aliases": {
-                challenge_id: str(self.aliases[challenge_id])
-                for challenge_id in sorted(self.completed_challenges)
-            },
-        }
+        data = self.get_progress_data()
 
         try:
             self.progress_path.parent.mkdir(parents=True, exist_ok=True)

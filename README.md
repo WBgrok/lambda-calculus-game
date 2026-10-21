@@ -1,8 +1,8 @@
 # Lambda Calculus Game
 
-A console game for learning lambda calculus through progressive challenges.
-Write lambda expressions, see each reduction step, and reuse completed
-solutions as aliases.
+A game for learning lambda calculus through progressive challenges. Play in the
+Python console or in a static browser build. Write lambda expressions, see each
+reduction step, and reuse completed solutions as aliases.
 
 ## Features
 
@@ -11,10 +11,12 @@ solutions as aliases.
 - Thirteen challenges with prerequisite-based unlocking
 - Automatic progress saving and resume between runs
 - A confirmation-protected **New Game** option
+- Static browser edition powered by Pyodide, with progress saved in browser
+  storage
 
 ## Requirements and installation
 
-- Python 3.8 or later
+- Python 3.9 or later for the console game and tests
 - No third-party Python packages are required
 
 From the project directory, run the game:
@@ -22,6 +24,30 @@ From the project directory, run the game:
 ```bash
 python main.py
 ```
+
+## Browser edition
+
+The browser edition uses the same Python parser, evaluator, challenge logic,
+and challenge JSON catalog. Its HTML/CSS/JavaScript frontend is in `web/`; it
+does not require a server-side Python process or backend.
+
+From the repository root, serve the files over HTTP:
+
+```bash
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000/web/`. Do not open `web/index.html` directly
+with a `file://` URL; the browser must fetch Python source files and the
+challenge catalog. For static hosting, publish the repository root or otherwise
+include `web/`, `game/`, `interpreter/`, and `challenges/` at the same relative
+paths. The Pyodide runtime is loaded from its pinned CDN release, so first use
+requires network access to that CDN.
+
+Browser progress is stored separately in the browser's `localStorage` and is
+not synchronized with the console save or other devices. Challenge definitions
+are fetched from `challenges/challenges.json` at runtime, so that catalog can
+be updated without changing the frontend.
 
 Progress is saved as JSON at
 `Path.home() / ".lambda-calculus-game" / "progress.json"` (under the current
@@ -38,8 +64,8 @@ python -m unittest discover -v
 ```
 
 Tests cover parsing and reduction, aliases, all challenge definitions,
-controller flows, and save/load/reset behavior. They use temporary progress
-files and do not change the user's game save.
+controller flows, save/load/reset behavior, and the browser bridge. They use
+temporary progress files and do not change the user's console-game save.
 
 ## Lambda syntax
 
@@ -78,6 +104,7 @@ game/menu.py            Console presentation
 game/game_state.py      Challenge state and progress persistence
 game/challenge.py       Challenge models and solution testing
 interpreter/             Parser and lambda evaluator
-challenges/challenges.json
-test_*.py                Standard-library automated tests
+challenges/challenges.json Challenge catalog
+web/                      Static HTML/CSS/JavaScript and Python bridge
+test_*.py                 Standard-library automated tests
 ```

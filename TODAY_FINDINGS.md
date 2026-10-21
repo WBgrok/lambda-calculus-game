@@ -27,13 +27,23 @@ challenge in the JSON catalog, prerequisite references, controller navigation,
 and progress loading, saving, validation, and reset. Persistence tests use
 temporary directories and do not touch a real user save.
 
-## Small remaining cleanup opportunities
+## Static browser edition
 
-- Challenge solution results are still represented as dictionaries. A typed
-  result model could replace them if the result shape grows.
-- Challenge catalog validation currently occurs through loading and tests;
-  stricter schema validation could be added if challenge authors need clearer
-  diagnostics.
+- Planning and prioritization are recorded in [WEB_PORT_PLAN.md](WEB_PORT_PLAN.md).
+- The static Pyodide frontend lives in `web/` and calls a JSON-facing Python
+  bridge; parser, evaluator, challenge logic, and challenge definitions remain
+  reusable and separate from presentation.
+- Challenge JSON is loaded as a runtime asset. Browser progress uses
+  `localStorage`, separate from the console save file, and the **New game**
+  action confirms before clearing it.
+- Local browser testing requires HTTP: run `python -m http.server 8000` from
+  the repository root and open `http://localhost:8000/web/`.
 
-No database or additional framework is currently needed for the project's
-scope.
+## Follow-up
+
+- Run and manually exercise the page in a browser with network access to the
+  pinned Pyodide CDN; Python unit tests validate the bridge, not browser/CDN
+  behavior.
+- Consider import/export of browser progress only if save portability is
+  requested. Accounts, synchronization, a backend, and offline/PWA support
+  remain out of scope.

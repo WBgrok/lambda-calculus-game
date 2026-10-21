@@ -1,2 +1,2 @@
 # No external dependencies required for basic functionality
-# Python 3.8+ standard library only
+# Python 3.9+ standard library only

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#17212b">
+    <title>Lambda Calculus Game</title>
+    <link rel="stylesheet" href="./style.css">
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <div>
+          <p class="eyebrow">A hands-on introduction</p>
+          <h1>Lambda Calculus Game</h1>
+        </div>
+        <button id="new-game" class="button button-quiet" type="button" disabled>
+          New game
+        </button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <p id="status" class="status" role="alert" hidden></p>
+      <aside class="panel progress-panel" aria-labelledby="progress-heading">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Your journey</p>
+            <h2 id="progress-heading">Challenges</h2>
+          </div>
+          <span id="progress-count" class="progress-count">Loading…</span>
+        </div>
+        <ol id="challenge-list" class="challenge-list"></ol>
+        <p class="storage-note">Progress is saved in this browser.</p>
+      </aside>
+
+      <div class="main-column">
+        <section class="panel challenge-panel" aria-labelledby="challenge-title">
+          <p class="eyebrow">Current challenge</p>
+          <h2 id="challenge-title">Loading game…</h2>
+          <p id="challenge-requirements" class="requirements"></p>
+          <div id="challenge-description" class="challenge-description"></div>
+          <form id="solution-form">
+            <label for="solution-input">Your solution</label>
+            <textarea id="solution-input" spellcheck="false" rows="3"
+              placeholder="For example: \x.x"></textarea>
+            <div class="form-actions">
+              <span class="input-hint">Use <code>\x.body</code> for a lambda.</span>
+              <button id="submit-solution" class="button" type="submit" disabled>
+                Check solution
+              </button>
+            </div>
+          </form>
+          <div id="challenge-results" class="results" aria-live="polite"></div>
+        </section>
+
+        <section class="panel interpreter-panel" aria-labelledby="interpreter-title">
+          <p class="eyebrow">Experiment freely</p>
+          <h2 id="interpreter-title">Lambda interpreter</h2>
+          <p>Try any expression, including aliases from completed challenges.</p>
+          <form id="interpreter-form">
+            <label for="expression-input">Expression</label>
+            <textarea id="expression-input" spellcheck="false" rows="2"
+              placeholder="For example: ID apple"></textarea>
+            <div class="form-actions">
+              <span class="input-hint">Leave empty challenge solutions to return here.</span>
+              <button id="evaluate-expression" class="button button-secondary"
+                type="submit" disabled>Evaluate</button>
+            </div>
+          </form>
+          <div id="interpreter-results" class="results" aria-live="polite"></div>
+        </section>
+      </div>
+    </main>
+    <footer>Lambda Calculus Game · Static browser edition</footer>
+  </body>
+</html>
