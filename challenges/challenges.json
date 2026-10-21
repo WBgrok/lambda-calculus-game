@@ -120,6 +120,118 @@
     "requirements": ["PAIR", "FST", "SCD"]
   },
   {
+    "id": "ANY",
+    "name": "Any True in a List",
+    "description": "Write a function that takes a list of three Church booleans and returns TRUE if at least one item is TRUE. It should return FALSE when all three items are FALSE.\n\nThe list is encoded with PAIR and ends with FALSE. Inspect each element with FST and move through the list with SCD. Combine the results with OR.",
+    "tests": [
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR FALSE FALSE)))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR TRUE (PAIR TRUE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR FALSE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR TRUE (PAIR FALSE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR FALSE (PAIR TRUE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR FALSE (PAIR TRUE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR FALSE (PAIR TRUE (PAIR TRUE FALSE)))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR TRUE (PAIR TRUE (PAIR FALSE FALSE)))",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["SIMPLE_LIST", "FST", "SCD", "OR"]
+  },
+  {
+    "id": "PUSH",
+    "name": "Push onto a List",
+    "description": "Write a function that takes an element and a list, then returns a new list with that element at the front.\n\nFor example, PUSH apple (PAIR banana FALSE) should produce PAIR apple (PAIR banana FALSE). The list is encoded as nested PAIRs and FALSE represents the empty list.",
+    "tests": [
+      {
+        "input": "apple FALSE",
+        "expected": "PAIR apple FALSE"
+      },
+      {
+        "input": "apple (PAIR banana FALSE)",
+        "expected": "PAIR apple (PAIR banana FALSE)"
+      },
+      {
+        "input": "red (PAIR green (PAIR blue FALSE))",
+        "expected": "PAIR red (PAIR green (PAIR blue FALSE))"
+      },
+      {
+        "input": "(\\x.x) FALSE",
+        "expected": "PAIR (\\x.x) FALSE"
+      }
+    ],
+    "requirements": ["ANY", "PAIR"]
+  },
+  {
+    "id": "POP",
+    "name": "Pop from a List",
+    "description": "Write a function that takes a non-empty list and returns its tail: the list containing every element except the first.\n\nFor example, POP (PAIR apple (PAIR banana FALSE)) should produce PAIR banana FALSE. When the input has just one item, its tail is the empty list FALSE.",
+    "tests": [
+      {
+        "input": "(PAIR apple FALSE)",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR (\\x.x) (PAIR second FALSE))",
+        "expected": "PAIR second FALSE"
+      },
+      {
+        "input": "(PAIR a (PAIR b (PAIR c (PAIR d FALSE))))",
+        "expected": "PAIR b (PAIR c (PAIR d FALSE))"
+      }
+    ],
+    "requirements": ["PUSH", "SCD"]
+  },
+  {
+    "id": "EMPTY",
+    "name": "Is the List Empty?",
+    "description": "Write a function that takes a list and returns TRUE if it is empty, or FALSE if it contains at least one item.\n\nThe empty list is FALSE. A non-empty list is a pair, which can be used as a selector: apply the list to a handler for its head and tail, then to the empty-case result.",
+    "tests": [
+      {
+        "input": "FALSE",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PAIR apple FALSE)",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(PAIR a (PAIR b (PAIR c FALSE)))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(POP (PAIR apple FALSE))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(PUSH apple FALSE)",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["POP", "PUSH", "TRUE", "FALSE"]
+  },
+  {
     "id": "SWAP",
     "name": "Swap Arguments",
     "description": "Write a function that takes two arguments and returns them in reverse order.\n\nSWAP A B should evaluate to B A\n\nThis requires careful use of bracketing since application is left-associative.",

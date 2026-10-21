@@ -24,6 +24,12 @@ class AdditionalChallengeTests(unittest.TestCase):
             "SCD": r"\p.p FALSE",
             "SWAP": r"\x.\y.y x",
             "SQR": r"\f.\x.f (f x)",
+            "OR": r"\p.\q.p TRUE q",
+            "SIMPLE_LIST": r"\lst.FST (SCD (SCD lst))",
+            "ANY": r"\lst.OR (FST lst) (OR (FST (SCD lst)) (FST (SCD (SCD lst))))",
+            "PUSH": r"\item.\lst.PAIR item lst",
+            "POP": r"\lst.SCD lst",
+            "EMPTY": r"\lst.lst (\head.\tail.\ignored.FALSE) TRUE",
         }
         for challenge_id, source in solutions.items():
             solution = Parser(
@@ -66,6 +72,24 @@ class AdditionalChallengeTests(unittest.TestCase):
         self.assert_challenge_passes(
             "SIMPLE_LIST",
             r"\lst.FST (SCD (SCD lst))",
+        )
+
+    def test_any_true_in_list_challenge(self):
+        self.assert_challenge_passes(
+            "ANY",
+            r"\lst.OR (FST lst) (OR (FST (SCD lst)) (FST (SCD (SCD lst))))",
+        )
+
+    def test_push_challenge(self):
+        self.assert_challenge_passes("PUSH", r"\item.\lst.PAIR item lst")
+
+    def test_pop_challenge(self):
+        self.assert_challenge_passes("POP", r"\lst.SCD lst")
+
+    def test_empty_list_challenge(self):
+        self.assert_challenge_passes(
+            "EMPTY",
+            r"\lst.lst (\head.\tail.\ignored.FALSE) TRUE",
         )
 
     def test_boolean_and_challenge(self):
@@ -124,7 +148,8 @@ class AdditionalChallengeTests(unittest.TestCase):
             challenge_ids,
             {
                 "ANYTHING",
-                "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SIMPLE_LIST", "SWAP",
+                "ID", "TRUE", "FALSE", "PAIR", "FST", "SCD", "SIMPLE_LIST",
+                "ANY", "PUSH", "POP", "EMPTY", "SWAP",
                 "SQR", "INDIRECTION", "IF", "NOT", "AND", "OR", "XOR",
             },
         )
