@@ -1,71 +1,71 @@
 # Lambda Calculus Game
 
-A game for learning lambda calculus through progressive challenges. Play in the
-Python console or in a static browser build. Write lambda expressions, see each
-reduction step, and reuse completed solutions as aliases.
+A small game for learning lambda calculus by writing expressions, watching them
+reduce, and solving progressive challenges. Play in a terminal or in your
+browser.
 
-## Features
+## Play in your browser
 
-- Backslash lambda notation, for example `\x.x` for identity
-- Step-by-step beta reduction and a free interpreter
-- Thirteen challenges with prerequisite-based unlocking
-- Automatic progress saving and resume between runs
-- A confirmation-protected **New Game** option
-- Static browser edition powered by Pyodide, with progress saved in browser
-  storage
+The browser edition runs as a static site. It uses Pyodide to run the project's
+Python parser, evaluator, and challenge logic; it does not need a backend,
+database, frontend build, or installed Python runtime.
 
-## Requirements and installation
+Once GitHub Pages is enabled, open the published repository URL with `/web/`
+appended.
 
-- Python 3.9 or later for the console game and tests
-- No third-party Python packages are required
+### Run locally
 
-From the project directory, run the game:
-
-```bash
-python main.py
-```
-
-## Browser edition
-
-The browser edition uses the same Python parser, evaluator, challenge logic,
-and challenge JSON catalog. Its HTML/CSS/JavaScript frontend is in `web/`; it
-does not require a server-side Python process or backend.
-
-From the repository root, serve the files over HTTP:
+Install Python 3.9 or later, then serve the repository root over HTTP:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open `http://localhost:8000/web/`. Do not open `web/index.html` directly
-with a `file://` URL; the browser must fetch Python source files and the
-challenge catalog. For static hosting, publish the repository root or otherwise
-include `web/`, `game/`, `interpreter/`, and `challenges/` at the same relative
-paths. The Pyodide runtime is loaded from its pinned CDN release, so first use
-requires network access to that CDN.
+Open <http://localhost:8000/web/>. Do not open `web/index.html` directly with a
+`file://` URL: the app fetches Python modules and challenge data from the site.
 
-Browser progress is stored separately in the browser's `localStorage` and is
-not synchronized with the console save or other devices. Challenge definitions
-are fetched from `challenges/challenges.json` at runtime, so that catalog can
-be updated without changing the frontend.
+### Deploy with GitHub Pages
 
-Progress is saved as JSON at
-`Path.home() / ".lambda-calculus-game" / "progress.json"` (under the current
-user's home directory). Completing a challenge saves automatically. Select
-**New Game** in the main menu to remove the save; the game asks for confirmation
-first.
+1. Open the repository's **Settings → Pages**.
+2. Under **Build and deployment**, choose **Deploy from a branch**.
+3. Select the branch containing the published version of the game and choose
+   `/(root)` as the folder.
+4. Save the settings and wait for Pages to finish publishing.
+5. Open the published site URL with `/web/` appended, for example:
+   `https://OWNER.github.io/REPOSITORY/web/`.
 
-## Tests
+Publish the repository root, not only the `web/` directory. The browser loads
+`game/`, `interpreter/`, and `challenges/` from sibling paths. A custom domain
+can point to the same `/web/` path.
 
-Run the complete standard-library test suite from the project directory:
+The Pyodide runtime is fetched from its pinned CDN release, so the browser needs
+network access to that CDN when starting the game. Challenge data is fetched
+from `challenges/challenges.json` at runtime. When publishing challenge
+changes, ensure the host or CDN revalidates that JSON asset.
+
+## Play in the terminal
+
+Python 3.9 or later is required. The console game uses only the Python standard
+library.
 
 ```bash
-python -m unittest discover -v
+python main.py
 ```
 
-Tests cover parsing and reduction, aliases, all challenge definitions,
-controller flows, save/load/reset behavior, and the browser bridge. They use
-temporary progress files and do not change the user's console-game save.
+Completed challenges save automatically to
+`Path.home() / ".lambda-calculus-game" / "progress.json"`. Choose **New Game**
+from the main menu and confirm to clear the save.
+
+## Progress and game behavior
+
+The game includes thirteen challenges with prerequisite-based unlocking.
+Completed challenge solutions can be reused by their challenge IDs as aliases.
+The free interpreter shows a reduction trace for any valid expression.
+
+Browser progress is saved in that browser profile's `localStorage`. It is
+separate from the console save and is not synchronized between browsers or
+devices. The browser's **New game** action confirms before clearing local
+progress.
 
 ## Lambda syntax
 
@@ -73,38 +73,32 @@ temporary progress files and do not change the user's console-game save.
 - `function argument` applies a function to an argument; application is
   left-associative.
 - Parentheses group expressions.
-- Multiple parameters are written as nested lambdas, e.g. `\x.\y.x`.
-- A completed challenge ID, such as `ID`, can be used as an alias.
+- Multiple parameters are nested lambdas, for example `\x.\y.x`.
+- Completed challenge IDs such as `ID` can be used as aliases.
 
-## Evaluation API
+## Challenges
 
-`parse_and_eval(source, aliases=None)` returns an `EvaluationResult`:
+Challenge definitions live in [`challenges/challenges.json`](challenges/challenges.json).
+Each entry contains an `id`, `name`, `description`, a list of tests (`input`
+and `expected` expressions), and optional prerequisite IDs in `requirements`.
+The browser fetches this JSON at runtime, so challenge content can be updated
+independently from the frontend.
 
-- `initial_expression`: parsed input expression
-- `final_expression`: expression after reduction
-- `steps`: immutable tuple of `ReductionStep` objects, each with `expression`
-  and `description`
+## Run the tests
 
-Malformed source raises `LambdaSyntaxError` (a `SyntaxError` subclass);
-reduction-limit exhaustion raises `EvaluationLimitError` (a `RuntimeError`
-subclass).
+The test suite uses the standard library and temporary save files:
 
-## Challenge definitions
-
-Challenges are defined in `challenges/challenges.json`. Each entry has an
-`id`, `name`, `description`, a list of `tests` (`input` and `expected` source
-expressions), and optional prerequisite challenge IDs in `requirements`.
-
-## Project layout
-
+```bash
+python -m unittest discover -v
 ```
-main.py                 Game entry point
-game/controller.py      Game flow
-game/menu.py            Console presentation
-game/game_state.py      Challenge state and progress persistence
-game/challenge.py       Challenge models and solution testing
-interpreter/             Parser and lambda evaluator
-challenges/challenges.json Challenge catalog
-web/                      Static HTML/CSS/JavaScript and Python bridge
-test_*.py                 Standard-library automated tests
-```
+
+Tests cover parsing and reduction, aliases, all challenge definitions,
+controller flows, progress persistence, and the browser-facing Python bridge.
+
+## Project structure
+
+- `interpreter/` — parser, evaluator, and reduction results
+- `game/` — challenge models, game state, console controller and view
+- `challenges/challenges.json` — editable challenge catalog
+- `web/` — static browser UI and Pyodide bridge
+- `test_*.py` — standard-library automated tests
