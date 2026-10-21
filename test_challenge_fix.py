@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from game.game_state import GameState
 from game.controller import GameController
+from game.menu import ConsoleView
 from interpreter.lambda_interpreter import Parser
 
 
@@ -73,6 +74,18 @@ class ChallengeTests(unittest.TestCase):
             for challenge in self.game_state.get_available_challenges()
         }
         self.assertIn("PAIR", available_ids)
+
+    def test_console_menu_displays_only_unlocked_challenges(self):
+        output = io.StringIO()
+        with patch("builtins.input", return_value="1"):
+            with redirect_stdout(output):
+                ConsoleView().show_main_menu(
+                    self.game_state.get_available_challenges(),
+                    self.game_state.completed_challenges,
+                )
+
+        self.assertIn("TRUE", output.getvalue())
+        self.assertNotIn("PAIR", output.getvalue())
 
     def test_menu_completes_typed_challenge(self):
         controller = GameController(self.game_state)

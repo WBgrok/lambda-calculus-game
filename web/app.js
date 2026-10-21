@@ -93,7 +93,7 @@ function renderDescription(description) {
 function renderState(state) {
   gameState = state;
   progressCount.textContent =
-    `${state.completed_count} of ${state.challenges.length} complete`;
+    `${state.completed_count} of ${state.total_challenges} complete`;
   newGameButton.disabled = state.completed_count === 0;
 
   challengeList.replaceChildren();
@@ -101,7 +101,6 @@ function renderState(state) {
     const item = document.createElement("li");
     const button = document.createElement("button");
     button.type = "button";
-    button.disabled = !challenge.unlocked;
     button.dataset.challengeId = challenge.id;
     button.setAttribute(
       "aria-current",
@@ -114,10 +113,6 @@ function renderState(state) {
       mark.classList.add("complete");
       mark.textContent = "✓";
       mark.setAttribute("aria-label", "Completed");
-    } else if (!challenge.unlocked) {
-      mark.classList.add("locked");
-      mark.textContent = "·";
-      mark.setAttribute("aria-label", "Locked");
     } else {
       mark.textContent = challenge.id;
       mark.setAttribute("aria-label", "Available");
@@ -133,7 +128,7 @@ function renderState(state) {
   const selected = state.challenges.find(
     (challenge) => challenge.id === selectedChallengeId
   );
-  if (!selected || !selected.unlocked) {
+  if (!selected) {
     const nextChallenge = state.challenges.find(
       (challenge) => challenge.unlocked && !challenge.completed
     ) || state.challenges.find((challenge) => challenge.unlocked);

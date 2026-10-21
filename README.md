@@ -70,7 +70,8 @@ from the main menu and confirm to clear the save.
 
 ## Progress and game behavior
 
-The game includes thirty-one challenges with prerequisite-based unlocking.
+The game includes forty-one challenges with prerequisite-based unlocking.
+The terminal and browser challenge lists show only unlocked challenges.
 Completed challenge solutions can be reused by their challenge IDs as aliases.
 The free interpreter shows a reduction trace for any valid expression.
 

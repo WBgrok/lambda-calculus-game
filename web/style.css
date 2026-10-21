@@ -178,9 +178,7 @@ h2 {
   background: var(--good);
 }
 
-.challenge-mark.locked {
-  font-size: 0.8rem;
-}
+
 
 .storage-note {
   margin: 0;

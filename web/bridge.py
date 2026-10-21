@@ -26,9 +26,7 @@ def initialize(challenges_json: str, progress_json: Optional[str] = None) -> str
 def get_state() -> str:
     """Return challenge metadata and progress as JSON."""
     state = _require_state()
-    unlocked_ids = {
-        challenge.id for challenge in state.get_available_challenges()
-    }
+    available_challenges = state.get_available_challenges()
     challenges = [
         {
             "id": challenge.id,
@@ -36,12 +34,13 @@ def get_state() -> str:
             "description": challenge.description,
             "requirements": list(challenge.requirements),
             "completed": state.is_completed(challenge.id),
-            "unlocked": challenge.id in unlocked_ids,
+            "unlocked": True,
         }
-        for challenge in state.challenges_data
+        for challenge in available_challenges
     ]
     return json.dumps({
         "challenges": challenges,
+        "total_challenges": len(state.challenges_data),
         "completed_count": len(state.completed_challenges),
         "progress": state.get_progress_data(),
     })

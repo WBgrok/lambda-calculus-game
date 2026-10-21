@@ -504,6 +504,266 @@
     "requirements": ["Y", "PUSH"]
   },
   {
+    "id": "SUC",
+    "name": "Successor",
+    "description": "Church numerals encode a natural number N as a function that applies a function F to a starting value X exactly N times.\n\nWrite SUC to take a numeral N and return N + 1. For example, applying SUC to zero and then to a marker function should produce the marker once.",
+    "tests": [
+      {
+        "input": "(\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      },
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK seed)))"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))))))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK seed)))))))))"
+      }
+    ],
+    "requirements": ["REVERSE"]
+  },
+  {
+    "id": "ZERO",
+    "name": "Is Zero?",
+    "description": "Write ZERO to take a Church numeral and return TRUE if it is zero, or FALSE otherwise.\n\nA Church numeral applies its first argument once for each count. Choose an argument that always returns FALSE; if the numeral applies it at least once, the result is FALSE, while zero leaves the initial TRUE unchanged.",
+    "tests": [
+      {
+        "input": "(\\f.\\x.x)",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(\\f.\\x.f x)",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x))))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x))))))",
+        "expected": "FALSE"
+      }
+    ],
+    "requirements": ["TRUE", "FALSE", "SUC"]
+  },
+  {
+    "id": "PRE",
+    "name": "Predecessor",
+    "description": "Write PRE to take a Church numeral N and return N - 1. Since this game uses non-negative numerals, PRE zero should also be zero.\n\nYou can use SUC to build test numerals. Check zero and one carefully, as both must produce zero.",
+    "tests": [
+      {
+        "input": "(\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (\\f.\\x.x)) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK seed)))"
+      }
+    ],
+    "requirements": ["SUC"]
+  },
+  {
+    "id": "ADD",
+    "name": "Addition",
+    "description": "Write ADD to take two Church numerals and return their sum. You can test the result by applying it to a marker function and counting the markers.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK seed))))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK seed))))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(\\f.\\x.x) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK seed)))))))))"
+      }
+    ],
+    "requirements": ["SUC"]
+  },
+  {
+    "id": "SUB",
+    "name": "Subtraction",
+    "description": "Write SUB to take two Church numerals X and Y and return X - Y. Subtraction is floored at zero, so when Y is larger than X, return zero.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(\\f.\\x.x) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK seed)))"
+      },
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (SUC (SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))))) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))))) (ADD (SUC (SUC (SUC (SUC (\\f.\\x.x))))) (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      }
+    ],
+    "requirements": ["Y", "ZERO", "PRE", "SUC", "ADD"]
+  },
+  {
+    "id": "MUL",
+    "name": "Multiplication",
+    "description": "Write MUL to take two Church numerals and return their product. Multiplying by zero should always produce zero.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK (MARK seed)))))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK (MARK seed)))))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(\\f.\\x.x) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK (MARK seed)))))))))"
+      }
+    ],
+    "requirements": ["SUC"]
+  },
+  {
+    "id": "DIV",
+    "name": "Division",
+    "description": "Write DIV to divide a Church numeral X by Y. Every test uses a divisor greater than zero that divides X evenly; division by zero is not part of this challenge.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x))))))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (SUC (\\f.\\x.x))))))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK seed))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      },
+      {
+        "input": "(SUC (\\f.\\x.x)) (SUC (\\f.\\x.x)) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (SUC (\\f.\\x.x)) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK seed))))"
+      },
+      {
+        "input": "(\\f.\\x.x) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "seed"
+      }
+    ],
+    "requirements": ["Y", "ZERO", "SUC", "SUB"]
+  },
+  {
+    "id": "EQ",
+    "name": "Numeral Equality",
+    "description": "Write EQ to compare two Church numerals. Return TRUE when they represent the same number, and FALSE otherwise.",
+    "tests": [
+      {
+        "input": "(\\f.\\x.x) (\\f.\\x.x)",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(SUC (\\f.\\x.x)) (SUC (\\f.\\x.x))",
+        "expected": "TRUE"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (\\f.\\x.x))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (SUC (\\f.\\x.x)))))",
+        "expected": "FALSE"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (ADD (SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (\\f.\\x.x)))))",
+        "expected": "TRUE"
+      }
+    ],
+    "requirements": ["ZERO", "SUB", "AND", "SUC", "ADD"]
+  },
+  {
+    "id": "MIN",
+    "name": "Minimum",
+    "description": "Write MIN to take two Church numerals and return the smaller one.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK seed)"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "seed"
+      },
+      {
+        "input": "(SUC (\\f.\\x.x)) (SUC (\\f.\\x.x)) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      }
+    ],
+    "requirements": ["ZERO", "SUB", "SUC"]
+  },
+  {
+    "id": "MAX",
+    "name": "Maximum",
+    "description": "Write MAX to take two Church numerals and return the larger one.",
+    "tests": [
+      {
+        "input": "(SUC (SUC (SUC (\\f.\\x.x)))) (SUC (SUC (\\f.\\x.x))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK seed))"
+      },
+      {
+        "input": "(SUC (SUC (\\f.\\x.x))) (SUC (SUC (SUC (\\f.\\x.x)))) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK seed))"
+      },
+      {
+        "input": "(SUC (SUC (SUC (SUC (SUC (\\f.\\x.x)))))) (\\f.\\x.x) (\\z.MARK z) seed",
+        "expected": "MARK (MARK (MARK (MARK (MARK seed))))"
+      },
+      {
+        "input": "(SUC (\\f.\\x.x)) (SUC (\\f.\\x.x)) (\\z.MARK z) seed",
+        "expected": "MARK seed"
+      }
+    ],
+    "requirements": ["ZERO", "SUB", "SUC"]
+  },
+  {
     "id": "SWAP",
     "name": "Swap Arguments",
     "description": "Write a function that takes two arguments and returns them in reverse order.\n\nSWAP A B should evaluate to B A\n\nThis requires careful use of bracketing since application is left-associative.",

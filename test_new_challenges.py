@@ -82,6 +82,19 @@ class AdditionalChallengeTests(unittest.TestCase):
                 r"remaining (\head.\tail.\dummy.rec tail (PUSH head acc)) acc)"
                 r" lst FALSE"
             ),
+            "SUC": r"\n.\f.\x.f (n f x)",
+            "ZERO": r"\n.n (\x.FALSE) TRUE",
+            "PRE": r"\n.\f.\x.n (\g.\h.h (g f)) (\u.x) (\u.u)",
+            "ADD": r"\a.\b.\f.\x.b f (a f x)",
+            "SUB": r"Y (\rec.\a.\b.ZERO b a (PRE (rec a (PRE b))))",
+            "MUL": r"\a.\b.\f.a (b f)",
+            "DIV": (
+                r"\a.\b.Y "
+                r"(\rec.\n.ZERO n (\f.\x.x) (SUC (rec (SUB n b)))) a"
+            ),
+            "EQ": r"\a.\b.AND (ZERO (SUB a b)) (ZERO (SUB b a))",
+            "MIN": r"\a.\b.ZERO (SUB a b) a b",
+            "MAX": r"\a.\b.ZERO (SUB a b) b a",
         }
         for challenge_id, source in solutions.items():
             solution = Parser(
@@ -225,6 +238,49 @@ class AdditionalChallengeTests(unittest.TestCase):
             r" lst FALSE",
         )
 
+    def test_successor_challenge(self):
+        self.assert_challenge_passes("SUC", r"\n.\f.\x.f (n f x)")
+
+    def test_zero_predicate_challenge(self):
+        self.assert_challenge_passes("ZERO", r"\n.n (\x.FALSE) TRUE")
+
+    def test_predecessor_challenge(self):
+        self.assert_challenge_passes(
+            "PRE",
+            r"\n.\f.\x.n (\g.\h.h (g f)) (\u.x) (\u.u)",
+        )
+
+    def test_addition_challenge(self):
+        self.assert_challenge_passes("ADD", r"\a.\b.\f.\x.b f (a f x)")
+
+    def test_subtraction_challenge(self):
+        self.assert_challenge_passes(
+            "SUB",
+            r"Y (\rec.\a.\b.ZERO b a (PRE (rec a (PRE b))))",
+        )
+
+    def test_multiplication_challenge(self):
+        self.assert_challenge_passes("MUL", r"\a.\b.\f.a (b f)")
+
+    def test_division_challenge(self):
+        self.assert_challenge_passes(
+            "DIV",
+            r"\a.\b.Y "
+            r"(\rec.\n.ZERO n (\f.\x.x) (SUC (rec (SUB n b)))) a",
+        )
+
+    def test_numeral_equality_challenge(self):
+        self.assert_challenge_passes(
+            "EQ",
+            r"\a.\b.AND (ZERO (SUB a b)) (ZERO (SUB b a))",
+        )
+
+    def test_minimum_challenge(self):
+        self.assert_challenge_passes("MIN", r"\a.\b.ZERO (SUB a b) a b")
+
+    def test_maximum_challenge(self):
+        self.assert_challenge_passes("MAX", r"\a.\b.ZERO (SUB a b) b a")
+
     def test_boolean_and_challenge(self):
         self.assert_challenge_passes("AND", r"\p.\q.p q FALSE")
 
@@ -286,6 +342,8 @@ class AdditionalChallengeTests(unittest.TestCase):
                 "SQR", "INDIRECTION", "IF", "NOT", "AND", "OR", "XOR",
                 "Y", "STRIP_PREFIX", "ACC", "ALL", "MAP", "NONE", "FILTER",
                 "ZIP", "EQBLIST", "CONCAT", "REVERSE",
+                "SUC", "ZERO", "PRE", "ADD", "SUB", "MUL", "DIV", "EQ",
+                "MIN", "MAX",
             },
         )
         for challenge in self.game_state.challenges_data:

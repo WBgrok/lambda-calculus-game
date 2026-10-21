@@ -17,13 +17,14 @@ class WebBridgeTests(unittest.TestCase):
         self.state = json.loads(bridge.initialize(self.challenge_json))
 
     def test_catalog_starts_with_the_introductory_challenges_unlocked(self):
-        available = [
-            challenge["id"]
-            for challenge in self.state["challenges"]
-            if challenge["unlocked"]
-        ]
-
-        self.assertEqual(available, ["ANYTHING", "ID"])
+        self.assertEqual(
+            [challenge["id"] for challenge in self.state["challenges"]],
+            ["ANYTHING", "ID"],
+        )
+        self.assertEqual(
+            self.state["total_challenges"],
+            len(json.loads(self.challenge_json)),
+        )
         self.assertEqual(self.state["progress"]["completed_challenges"], [])
 
     def test_solution_results_have_json_friendly_steps_and_update_progress(self):
@@ -31,6 +32,10 @@ class WebBridgeTests(unittest.TestCase):
 
         self.assertTrue(result["all_passed"])
         self.assertEqual(result["progress"]["completed_challenges"], ["ID"])
+        self.assertEqual(
+            [challenge["id"] for challenge in result["state"]["challenges"]],
+            ["ANYTHING", "ID", "TRUE", "FALSE", "SWAP"],
+        )
         identity = next(
             challenge
             for challenge in result["state"]["challenges"]
